@@ -86,6 +86,7 @@ def Rho(left, right=None):
   else: # Monadic
     return left.shape
 
+# Helper for making simple dy/monadic functions
 def make_operator(m, d):
   def dyadic(left, right=None):
     left = APLize(left)
