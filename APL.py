@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- 
 import math
 
 id = lambda a: a
@@ -5,6 +6,16 @@ fmap = lambda f, a: list(map(f, a))
 reduce = lambda f, a: 0 if len(a) == 0 else f(a[0], reduce(f, a[1:])) if len(a) > 1 else a[0]
 zipWith = lambda f, a, b: [f(a[0], b[0])] + zipWith(f, a[1:], b[1:]) if len(a) > 1 and len(b) > 1 else [f(a[0], b[0])]
 numstr = lambda f: str(f) if not isinstance(f, float) else "{:.2f}".format(f)
+
+
+# returns unicode string
+def box(msg):
+  lines = fmap(lambda a: a.rstrip(), msg.split("\n"))
+  row = max(fmap(lambda a: len(a.decode("utf-8")), lines))
+  t = ''.join(['┌'] + ['─'*row] + ['┐'])
+  b = ''.join(['└'] + ['─'*row] + ['┘'])
+  middle = "\n" + "\n".join(fmap(lambda a: "│{:{}s}│".format(a, row), lines)) + "\n"
+  return t + middle + b
 
 class APLError(Exception):
   pass
@@ -21,11 +32,13 @@ class APLArray:
 
   def __str__(self):
     longest = max(fmap(lambda a: numstr(a), self.arr), key=lambda d: len(d))
-    fmt = lambda a: '{0: <{width}}'.format(numstr(a), width=len(longest))
-    mkStr = lambda arr: " ".join(fmap(fmt, arr.arr)) if len(arr.shape) == 1 else "\n".join(fmap(lambda a: mkStr(arr.at(a)), range(1, arr.shape[0]+1))) + "\n"
+    fmt = lambda a: '{0: >{width}}'.format(numstr(a), width=len(longest))
+    mkStr = lambda arr: " ".join(fmap(fmt, arr.arr)) if len(arr.shape) == 1 else box("\n".join(fmap(lambda a: mkStr(arr.at(a)), range(1, arr.shape[0]+1))))
     return mkStr(self).rstrip()
 
   def __getitem__(self, key):
+    if isinstance(key, int):
+      return self.at(key)
     return self.at(*list(key))
   
   # Fill empty spaces to fufill shape
@@ -124,7 +137,9 @@ Pow  = make_operator(lambda a: math.pow(math.e, a),lambda l, r: math.pow(l, r))
 Min  = make_operator(lambda a: math.floor(a), lambda l, r: l if l < r else r)
 Max  = make_operator(lambda a: math.ceil(a), lambda l, r: l if l > r else r)
 
-print(Rho([2, 3, 4, 5, 6], Iota(3333))[2, 3, 1, 1])
+
+print(Rho([2, 3, 4, 5, 6], Iota(3333))[2])
+print(Rho([2, 3,3], Iota(18)))
 
 # test = APLArray(iota(32), [4,2,2,2])
 # print("shape: " + str(test.shape))
