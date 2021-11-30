@@ -58,9 +58,28 @@ class APLArray:
     ## Brand New Array
     return APLArray(self.arr[indx:indx+amount], newshape)
 
+def APLize(arr):
+  if isinstance(arr, list):
+    return APLArray(arr)
+  if isinstance(arr, APLArray):
+    return arr
+
+def Rho(left, right=None):
+  left = APLize(left)
+  if right: # Dyadic
+    right = APLize(right)
+    if len(left.shape) == 1:
+      return APLArray(right.arr, left.arr)
+    else:
+      raise APLError("RANK ERROR", left)
+  else:
+    return left.shape
+
 def make_operator(m, d):
   def dyadic(left, right=None):
+    left = APLize(left)
     if right: # Dyadic
+      right = APLize(right)
       if left.singleton():
         return right.map(lambda r: d(left.singleton(), r))
       elif right.singleton():
@@ -82,14 +101,16 @@ Pow  = make_operator(lambda a: math.pow(math.e, a),lambda l, r: math.pow(l, r))
 Min  = make_operator(lambda a: math.floor(a), lambda l, r: l if l < r else r)
 Max  = make_operator(lambda a: math.ceil(a), lambda l, r: l if l > r else r)
 
-test = APLArray(iota(32), [4,2,2,2])
-print("shape: " + str(test.shape))
-print(test.at(2))
+# test = APLArray(iota(32), [4,2,2,2])
+# print("shape: " + str(test.shape))
+# print(test.at(2))
+
+print(Rho([3, 3], iota(9)))
 
 # print(Minu(APLArray([1, 2, 3])))
 # print(Divi(APLArray([1, 0.5, 3, 1, 0.5, 3], [2, 3])))
 # print(Mult(APLArray([1, -2, 3])))
-print(Add(APLArray([1, 2, 3, 4], [2, 2]), APLArray([1, 2, 3, 4], [2, 2])))
+#print(Add(APLArray([1, 2, 3, 4], [2, 2]), APLArray([1, 2, 3, 4], [2, 2])))
 # print(Pow(APLArray([1, 2, 3])))
 # print(Divi(APLArray([3]), APLArray([1, 2, 3])))
 # print(Max(APLArray([1, 2, 3, 4])))
