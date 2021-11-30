@@ -27,10 +27,20 @@ class APLArray:
     mkStr = lambda arr: " ".join(fmap(fmt, arr.arr)) if len(arr.shape) == 1 else "\n".join(fmap(lambda a: mkStr(arr.at(a)), iota(arr.shape[0]))) + "\n"
     return mkStr(self).rstrip()
   
+  # Fill empty spaces to fufill shape
+  def fill(self): 
+    need = reduce(lambda a, b: a*b, self.shape)
+    if need < len(self.arr): # good
+      return
+    self.arr = (self.arr * need)[:need] # Wacky but whatever
+    return self
+  
+  # Why not
   def map(self, f):
     self.arr = fmap(f, self.arr)
     return self
   
+  # value if singleton, None if not
   def singleton(self):
     return self.arr[0] if self.shape == [1] else None
 
@@ -58,6 +68,7 @@ class APLArray:
     ## Brand New Array
     return APLArray(self.arr[indx:indx+amount], newshape)
 
+# Let's make life easier
 def APLize(arr):
   if isinstance(arr, list):
     return APLArray(arr)
@@ -69,10 +80,10 @@ def Rho(left, right=None):
   if right: # Dyadic
     right = APLize(right)
     if len(left.shape) == 1:
-      return APLArray(right.arr, left.arr)
+      return APLArray(right.arr, left.arr).fill()
     else:
       raise APLError("RANK ERROR", left)
-  else:
+  else: # Monadic
     return left.shape
 
 def make_operator(m, d):
@@ -101,15 +112,14 @@ Pow  = make_operator(lambda a: math.pow(math.e, a),lambda l, r: math.pow(l, r))
 Min  = make_operator(lambda a: math.floor(a), lambda l, r: l if l < r else r)
 Max  = make_operator(lambda a: math.ceil(a), lambda l, r: l if l > r else r)
 
+print(Minu(Rho([3, 3], iota(3)), Rho([3,3], iota(9))))
+
 # test = APLArray(iota(32), [4,2,2,2])
 # print("shape: " + str(test.shape))
 # print(test.at(2))
 
-print(Rho([3, 3], iota(9)))
-
 # print(Minu(APLArray([1, 2, 3])))
 # print(Divi(APLArray([1, 0.5, 3, 1, 0.5, 3], [2, 3])))
-# print(Mult(APLArray([1, -2, 3])))
 #print(Add(APLArray([1, 2, 3, 4], [2, 2]), APLArray([1, 2, 3, 4], [2, 2])))
 # print(Pow(APLArray([1, 2, 3])))
 # print(Divi(APLArray([3]), APLArray([1, 2, 3])))
