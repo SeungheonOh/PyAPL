@@ -74,6 +74,10 @@ def APLize(arr):
     return APLArray(arr)
   if isinstance(arr, APLArray):
     return arr
+  if isinstance(arr, int):
+    return APLArray([arr])
+  if isinstance(arr, float):
+    return APLArray([arr])
 
 def Rho(left, right=None):
   left = APLize(left)
@@ -113,7 +117,7 @@ Pow  = make_operator(lambda a: math.pow(math.e, a),lambda l, r: math.pow(l, r))
 Min  = make_operator(lambda a: math.floor(a), lambda l, r: l if l < r else r)
 Max  = make_operator(lambda a: math.ceil(a), lambda l, r: l if l > r else r)
 
-print(Minu(Rho([3, 3], iota(3)), Rho([3,3], iota(9))))
+print(Rho(40, 1))
 
 # test = APLArray(iota(32), [4,2,2,2])
 # print("shape: " + str(test.shape))
