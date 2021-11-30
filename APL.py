@@ -6,8 +6,6 @@ reduce = lambda f, a: 0 if len(a) == 0 else f(a[0], reduce(f, a[1:])) if len(a) 
 zipWith = lambda f, a, b: [f(a[0], b[0])] + zipWith(f, a[1:], b[1:]) if len(a) > 1 and len(b) > 1 else [f(a[0], b[0])]
 numstr = lambda f: str(f) if not isinstance(f, float) else "{:.2f}".format(f)
 
-iota = lambda a: range(1, a+1)
-
 class APLError(Exception):
   pass
 
@@ -24,14 +22,18 @@ class APLArray:
   def __str__(self):
     longest = max(fmap(lambda a: numstr(a), self.arr), key=lambda d: len(d))
     fmt = lambda a: '{0: <{width}}'.format(numstr(a), width=len(longest))
-    mkStr = lambda arr: " ".join(fmap(fmt, arr.arr)) if len(arr.shape) == 1 else "\n".join(fmap(lambda a: mkStr(arr.at(a)), iota(arr.shape[0]))) + "\n"
+    mkStr = lambda arr: " ".join(fmap(fmt, arr.arr)) if len(arr.shape) == 1 else "\n".join(fmap(lambda a: mkStr(arr.at(a)), range(1, arr.shape[0]+1))) + "\n"
     return mkStr(self).rstrip()
+
+  def __getitem__(self, key):
+    return self.at(*list(key))
   
   # Fill empty spaces to fufill shape
   def fill(self): 
     need = reduce(lambda a, b: a*b, self.shape)
     if need < len(self.arr): # good
-      return
+      self.arr = self.arr[:need] # clean up
+      return self
     self.arr = (self.arr * need)[:need] # Wacky but whatever
     return self
   
@@ -43,6 +45,9 @@ class APLArray:
   # value if singleton, None if not
   def singleton(self):
     return self.arr[0] if self.shape == [1] else None
+  
+  def vectorize(self):
+    return self.arr
 
   # indexs orders from largest demention to the least demention 
   def at(self, *indexs): 
@@ -56,7 +61,7 @@ class APLArray:
 
     # Make multiplier based on shape
     shapeMultiplier = fmap(lambda l: reduce(lambda a, b: a * b, self.shape[l:])
-                          , iota(len(self.shape)-1)) + [1]
+                          , range(1, len(self.shape))) + [1]
 
     ## Apply multiplier
     indx = sum(zipWith(lambda a, b: (a-1) * b, indexs, shapeMultiplier))
@@ -109,6 +114,8 @@ def make_operator(m, d):
       return left.map(m)
   return dyadic
 
+Iota = lambda a: APLArray(range(1, a+1))
+
 Add  = make_operator(id, lambda l, r: l + r)
 Minu = make_operator(lambda a: -1*a, lambda l, r: l - r)
 Mult = make_operator(lambda a: a/abs(a), lambda l, r: l * r)
@@ -117,7 +124,7 @@ Pow  = make_operator(lambda a: math.pow(math.e, a),lambda l, r: math.pow(l, r))
 Min  = make_operator(lambda a: math.floor(a), lambda l, r: l if l < r else r)
 Max  = make_operator(lambda a: math.ceil(a), lambda l, r: l if l > r else r)
 
-print(Rho(40, 1))
+print(Rho([2, 3, 4, 5, 6], Iota(3333))[2, 3, 1, 1])
 
 # test = APLArray(iota(32), [4,2,2,2])
 # print("shape: " + str(test.shape))
