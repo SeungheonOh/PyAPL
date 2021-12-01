@@ -9,10 +9,14 @@ zip3With = lambda f, a, b, c: [f(a[0], b[0], c[0])] + zip3With(f, a[1:], b[1:], 
 numstr = lambda f: str(f) if not isinstance(f, float) else "{:.2f}".format(f)
 
 # returns unicode string
-def box(msg):
+def box(msg, title=None):
   lines = fmap(lambda a: a.rstrip(), msg.split("\n"))
   row = max(fmap(lambda a: len(a), lines))
-  t = ''.join(['┌'] + ['─'*row] + ['┐'])
+  if title:
+    title = title[:row]
+    t = ''.join(['┌'] + [title] + ['─'*(row - len(title))] + ['┐'])
+  else: 
+    t = ''.join(['┌'] + ['─'*row] + ['┐'])
   b = ''.join(['└'] + ['─'*row] + ['┘'])
   middle = "\n" + "\n".join(fmap(lambda a: "│{:{}s}│".format(a, row), lines)) + "\n"
   return t + middle + b
@@ -36,10 +40,7 @@ class APLArray:
   def __str__(self):
     longest = max(fmap(lambda a: numstr(a), self.arr), key=lambda d: len(d))
     fmt = lambda a: '{0: >{width}}'.format(numstr(a), width=len(longest))
-    groupbox = id 
-    if self.box:
-      groupbox = box
-    mkStr = lambda arr: " ".join(fmap(fmt, arr.arr)) if len(arr.shape) == 1 else groupbox("\n".join(fmap(lambda a: mkStr(arr.at(a)), range(1, arr.shape[0]+1))))
+    mkStr = lambda arr: " ".join(fmap(fmt, arr.arr)) if len(arr.shape) == 1 else box("\n".join(fmap(lambda a: mkStr(arr.at(a)), range(1, arr.shape[0]+1))), title=",".join(fmap(str, arr.shape)))
     return mkStr(self).rstrip()
   
   def __repr__(self):
@@ -162,20 +163,13 @@ def Split(apl, axis=-1):
 def Drop(l, r):
   ## TODO check shape of left
   diff = Magn(l)
-  newshape = Minu(APLArray(r.shape), APLArray(diff.arr+([0]*(len(r.shape)-len(diff.arr)))))
-  req = fmap(lambda a: list(range(1, a+1)), r.shape)
-  print(l.arr)
-  check = lambda a, b: reduce(lambda c, d: c and d, zip3With(lambda arr, sha, g: arr+g > sha, a, b, l.arr))#arr > sha, a, b, l.arr))
-  mk = lambda a, b: r.at(*a) if check(a, b) else []
-  indxs = lambda arr, opt: list(filter(lambda a: a != [], fmap(lambda b: indxs(b, opt[1:]), fmap(lambda a: arr + [a], opt[0])))) if len(opt) > 0 else mk(arr, l.arr)
-  flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
-  print("newshape: " + str(newshape))
+  newshape = Minu(APLArray(r.shape), APLArray(Magn(l).arr+([0]*(len(r.shape)-len(Magn(l).arr)))))
+  req = zipWith(lambda a, b: list(range(1 + b, a+1) if b >= 0 else range(1, a+1 + b)), r.shape, l.arr+([0]*(len(r.shape)-len(diff.arr))))
 
-  print(req)
-  print(len(r.shape))
-  print(indxs([], req))
-  print(flatten(indxs([], req), len(r.shape) - 1))
-  #return APLArray(flatten(indxs([], req), len(r.shape) - 1), newshape.arr)
+  indxs = lambda arr, opt: list(filter(lambda a: a != [], fmap(lambda b: indxs(b, opt[1:]), fmap(lambda a: arr + [a], opt[0])))) if len(opt) > 0 else r.at(*arr)
+  flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
+
+  return APLArray(flatten(indxs([], req), len(r.shape) - 1), newshape.arr)
 
 # Helper for making simple dy/monadic functions
 def make_operator(d=None, m=None):
@@ -232,10 +226,13 @@ print(t2)
 print(Split(t2, axis=3))
 
 print(t)
+print(Drop(APLArray([1]), t))
 print(Drop(APLArray([-1]), t))
-print(t2)
+print(Drop(APLArray([-1, 2]), t))
 print(Drop(APLArray([1]), t2))
-print(Split(Rho([3, 4], Iota(1000))))
+print(Drop(APLArray([1, 1, -2]), t2))
+
+print(box("hello world", title="asdf"))
 
 # test = APLArray(iota(32), [4,2,2,2])
 # print("shape: " + str(test.shape))
