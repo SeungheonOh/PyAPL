@@ -47,7 +47,7 @@ class APLArray:
     self.iterIndex = 0
     return self
   
-  def next(self):
+  def __next__(self):
     if self.iterIndex >= self.shape[0]:
       raise StopIteration
     self.iterIndex += 1
@@ -55,9 +55,7 @@ class APLArray:
 
   def __getitem__(self, key):
     if isinstance(key, slice):
-      # 1 based index
-      idxs = fmap(lambda a: a+1, range(*key.indices(len(self))))
-      return fmap(lambda a: self[a], idxs)
+      raise APLError("USE DROP INSTEAD")
     elif isinstance(key, int):
       return self.at(key)
     return self.at(*list(key))
@@ -150,7 +148,7 @@ def Split(apl, axis=-1):
 
   # Indexs - I have no idea what i did :D
   ## It generates index list of splited Array
-  mk= lambda arr: fmap(lambda b: apl.at(*arr[:axis]+[b]+arr[axis:]), fixedRange)
+  mk = lambda arr: fmap(lambda b: apl.at(*arr[:axis]+[b]+arr[axis:]), fixedRange)
   indxs = lambda arr, opt: fmap(lambda a: indxs(a, opt[1:]), fmap(lambda a: arr + [a], opt[0])) if len(opt) > 0 else mk(arr)
 
   # Reduce util...
@@ -158,6 +156,17 @@ def Split(apl, axis=-1):
   flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
 
   return APLArray(flatten(indxs([], req), len(apl.shape) - 2), newshape)
+
+def Drop(l, r):
+  ## TODO check shape of left
+  newshape = Minu(APLArray(r.shape), APLArray(l.arr+([0]*(len(r.shape)-len(l.arr)))))
+  ds = l.arr
+  req = fmap(lambda a: list(range(1, a+1)), newshape.arr)
+  test = lambda arr, d: fmap(lambda a: test(a, d[1:]), fmap(lambda a: arr + [a], d[0])) if len(d) > 0 else arr
+  print(ds)
+  print(newshape)
+  print(test(r.arr, req))
+  print(req)
 
 # Helper for making simple dy/monadic functions
 def make_operator(d, m=None):
@@ -201,6 +210,8 @@ Le   = make_operator(lambda l, r: 1 if l < r else 0)
 a = "A B C D E F G H I J K L M N O P Q R S T U V W X".split(" ")
 print(a)
 
+t = Rho([3, 4], Iota(1000))
+
 print(Split(Rho([3, 4], Iota(1000)), axis=1))
 print(Rho([2, 3, 4], a))
 print(Split(Rho([2, 3, 4], a)))
@@ -208,6 +219,7 @@ print(Split(Rho([2, 3, 4], a), axis=2))
 print(Split(Rho([2, 3, 4], a), axis=1))
 print(Split(Split(Rho([2, 3, 4], a))))
 
+print(Drop(APLArray([1]), Rho([3, 4], Iota(1000))))
 
 # test = APLArray(iota(32), [4,2,2,2])
 # print("shape: " + str(test.shape))
