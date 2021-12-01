@@ -5,6 +5,7 @@ id = lambda a: a
 fmap = lambda f, a: list(map(f, a))
 reduce = lambda f, a: 0 if len(a) == 0 else f(a[0], reduce(f, a[1:])) if len(a) > 1 else a[0]
 zipWith = lambda f, a, b: [f(a[0], b[0])] + zipWith(f, a[1:], b[1:]) if len(a) > 1 and len(b) > 1 else [f(a[0], b[0])]
+zip3With = lambda f, a, b, c: [f(a[0], b[0], c[0])] + zip3With(f, a[1:], b[1:], c[1:]) if len(a) > 1 and len(b) > 1 else [f(a[0], b[0], c[0])]
 numstr = lambda f: str(f) if not isinstance(f, float) else "{:.2f}".format(f)
 
 # returns unicode string
@@ -23,6 +24,8 @@ class APLArray:
   ## NOTE
   # self.arr is ALWAYS a vector
   # self.shape will determine the dementions of data
+  ## TODO 
+  # refactor shape, remove prefixes of one
 
   # shapes orders from largest demention to the least demention
   def __init__(self, arr, shape=None, box=True):
@@ -74,8 +77,7 @@ class APLArray:
   
   # Why not
   def mapAll(self, f):
-    self.arr = fmap(f, self.arr)
-    return self
+    return APLArray(fmap(f, self.arr), self.shape)
   
   # value if singleton, None if not
   def singleton(self):
@@ -159,17 +161,24 @@ def Split(apl, axis=-1):
 
 def Drop(l, r):
   ## TODO check shape of left
-  newshape = Minu(APLArray(r.shape), APLArray(l.arr+([0]*(len(r.shape)-len(l.arr)))))
-  ds = l.arr
-  req = fmap(lambda a: list(range(1, a+1)), newshape.arr)
-  test = lambda arr, d: fmap(lambda a: test(a, d[1:]), fmap(lambda a: arr + [a], d[0])) if len(d) > 0 else arr
-  print(ds)
-  print(newshape)
-  print(test(r.arr, req))
+  diff = Magn(l)
+  newshape = Minu(APLArray(r.shape), APLArray(diff.arr+([0]*(len(r.shape)-len(diff.arr)))))
+  req = fmap(lambda a: list(range(1, a+1)), r.shape)
+  print(l.arr)
+  check = lambda a, b: reduce(lambda c, d: c and d, zip3With(lambda arr, sha, g: arr+g > sha, a, b, l.arr))#arr > sha, a, b, l.arr))
+  mk = lambda a, b: r.at(*a) if check(a, b) else []
+  indxs = lambda arr, opt: list(filter(lambda a: a != [], fmap(lambda b: indxs(b, opt[1:]), fmap(lambda a: arr + [a], opt[0])))) if len(opt) > 0 else mk(arr, l.arr)
+  flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
+  print("newshape: " + str(newshape))
+
   print(req)
+  print(len(r.shape))
+  print(indxs([], req))
+  print(flatten(indxs([], req), len(r.shape) - 1))
+  #return APLArray(flatten(indxs([], req), len(r.shape) - 1), newshape.arr)
 
 # Helper for making simple dy/monadic functions
-def make_operator(d, m=None):
+def make_operator(d=None, m=None):
   def dyadic(left, right=None):
     left = APLize(left)
     if right: # Dyadic
@@ -189,7 +198,7 @@ def make_operator(d, m=None):
       return left.mapAll(m)
   return dyadic
 
-Iota = lambda a: APLArray(range(1, a+1))
+Iota = lambda a: APLArray(list(range(1, a+1)))
 
 Add  = make_operator(lambda l, r: l + r, id)
 Minu = make_operator(lambda l, r: l - r, lambda a: -1*a)
@@ -202,6 +211,7 @@ GrE  = make_operator(lambda l, r: 1 if l >= r else 0)
 Gr   = make_operator(lambda l, r: 1 if l > r else 0)
 LeE  = make_operator(lambda l, r: 1 if l <= r else 0)
 Le   = make_operator(lambda l, r: 1 if l < r else 0)
+Magn = make_operator(lambda l, r: 0, lambda a: int(abs(a)) if isinstance(a, int) else abs(a))
 
 # print(Rho([2, 3, 4, 5, 6], Iota(3333))[2])
 # print(Rho([2, 3,3], Iota(18)))
@@ -211,15 +221,21 @@ a = "A B C D E F G H I J K L M N O P Q R S T U V W X".split(" ")
 print(a)
 
 t = Rho([3, 4], Iota(1000))
+t2 = Rho([2, 2, 3, 4], Iota(1000))
 
-print(Split(Rho([3, 4], Iota(1000)), axis=1))
-print(Rho([2, 3, 4], a))
-print(Split(Rho([2, 3, 4], a)))
-print(Split(Rho([2, 3, 4], a), axis=2))
-print(Split(Rho([2, 3, 4], a), axis=1))
-print(Split(Split(Rho([2, 3, 4], a))))
+# print(Split(Rho([3, 4], Iota(1000)), axis=1))
+# print(Rho([2, 3, 4], a))
+# print(Split(Rho([2, 3, 4], a)))
+# print(Split(Rho([2, 3, 4], a), axis=2))
+# print(Split(Rho([2, 3, 4], a), axis=1))
+print(t2)
+print(Split(t2, axis=3))
 
-print(Drop(APLArray([1]), Rho([3, 4], Iota(1000))))
+print(t)
+print(Drop(APLArray([-1]), t))
+print(t2)
+print(Drop(APLArray([1]), t2))
+print(Split(Rho([3, 4], Iota(1000))))
 
 # test = APLArray(iota(32), [4,2,2,2])
 # print("shape: " + str(test.shape))
