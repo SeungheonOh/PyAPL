@@ -34,8 +34,24 @@ class APLArray:
   # shapes orders from largest demention to the least demention
   def __init__(self, arr, shape=None, box=True):
     self.box = box
-    self.arr = arr
-    self.shape = [len(arr)] if not shape else shape
+    if isinstance(arr, APLArray): # We don't want APLArray getting nested
+      self.arr = arr.arr
+    elif isinstance(arr, int): 
+      self.arr = [arr]
+      self.shape = [0]
+      return
+    else:
+      self.arr = arr
+
+    if shape == [] or shape == [0] or len(arr) == 1:
+      self.shape = [0] # array with shape 0 should be considered as a list
+    else:
+      self.shape = [len(arr)] if not shape else shape
+    
+  def __eq__(self, a):
+    if not isinstance(a, APLArray):
+      return
+    return self.shape == a.shape and self.arr == a.arr
 
   def __str__(self):
     longest = max(fmap(lambda a: numstr(a), self.arr), key=lambda d: len(d))
@@ -48,6 +64,8 @@ class APLArray:
 
   # Let's make it iterable
   def __iter__(self):
+    if self.shape == [0]:
+      return iter(self.arr)
     self.iterIndex = 0
     return self
   
@@ -73,7 +91,7 @@ class APLArray:
     if need < len(self.arr): # good
       self.arr = self.arr[:need] # clean up
       return self
-    #self.arr = (self.arr * need)[:need] # Wacky but whatever
+    self.arr = (self.arr * need)[:need] # Wacky but whatever
     return self
   
   # Why not
@@ -82,7 +100,7 @@ class APLArray:
   
   # value if singleton, None if not
   def singleton(self):
-    return self.arr[0] if self.shape == [1] else None
+    return self.arr[0] if self.shape == [0] else None
   
   def vectorize(self):
     return self.arr
@@ -90,6 +108,8 @@ class APLArray:
   # indexs orders from largest demention to the least demention 
   def at(self, *indexs): 
     ## Validity
+    if len(indexs) > len(self.shape):
+      raise APLError("INDEX ERROR", indexs)
     # Negative indexs are invalid
     if not reduce(lambda a, b: a and b, fmap(lambda a: a > 0, indexs)):
       raise APLError("INDEX ERROR", indexs)
@@ -108,8 +128,13 @@ class APLArray:
     newshape = self.shape[len(indexs):] if self.shape[len(indexs):] != [] else [1]
     amount = reduce(lambda a, b: a * b, newshape)
 
+
     ## Brand New Array
+    if newshape == [1]: # Prevents nesting
+      return self.arr[indx]
     return APLArray(self.arr[indx:indx+amount], newshape)
+
+A = APLArray
 
 # Let's make life easier
 def APLize(arr):
@@ -124,7 +149,7 @@ def APLize(arr):
 
 def Rho(left, right=None):
   left = APLize(left)
-  if right: # Dyadic
+  if right != None: # Dyadic
     right = APLize(right)
     if len(left.shape) == 1:
       return APLArray(right.arr, left.arr).fill()
@@ -134,6 +159,7 @@ def Rho(left, right=None):
     return left.shape
 
 def Split(apl, axis=-1):
+  apl = APLize(apl)
   if axis == -1:
     axis = len(apl.shape) - 1
   else:
@@ -162,20 +188,45 @@ def Split(apl, axis=-1):
 
 def Drop(l, r):
   ## TODO check shape of left
-  diff = Magn(l)
-  newshape = Minu(APLArray(r.shape), APLArray(Magn(l).arr+([0]*(len(r.shape)-len(Magn(l).arr)))))
-  req = zipWith(lambda a, b: list(range(1 + b, a+1) if b >= 0 else range(1, a+1 + b)), r.shape, l.arr+([0]*(len(r.shape)-len(diff.arr))))
+  if len(l.shape) != 1:
+    raise APLError("RANK ERROR")
+  diff = fmap(lambda a: abs(a), l.arr)
+  newshape = Minu(APLArray(r.shape), APLArray(diff+([0]*(len(r.shape)-len(diff)))))
+  req = zipWith(lambda a, b: list(range(1 + b, a+1) if b >= 0 else range(1, a+1 + b)), r.shape, l.arr+([0]*(len(r.shape)-len(diff))))
 
   indxs = lambda arr, opt: list(filter(lambda a: a != [], fmap(lambda b: indxs(b, opt[1:]), fmap(lambda a: arr + [a], opt[0])))) if len(opt) > 0 else r.at(*arr)
   flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
 
   return APLArray(flatten(indxs([], req), len(r.shape) - 1), newshape.arr)
 
+## ~ to Split, except you reduce the splited elements
+def Reduce(op, r, axis=-1):
+  apl = APLize(r)
+  if axis == -1:
+    axis = len(apl.shape) - 1
+  else:
+    axis = axis - 1
+  fixedRange = list(range(1, apl.shape[axis]+1))
+
+  newshape = apl.shape[:axis] + apl.shape[axis+1:]
+
+  req = fmap(lambda a: list(range(1, a+1)), newshape)
+
+  mk = lambda arr: reduce(op, fmap(lambda b: apl.at(*arr[:axis]+[b]+arr[axis:]), fixedRange))
+  indxs = lambda arr, opt: fmap(lambda a: indxs(a, opt[1:]), fmap(lambda a: arr + [a], opt[0])) if len(opt) > 0 else mk(arr)
+
+  flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
+
+  # We don't want APLArray in APLArray
+  safeguard = lambda a: fmap(lambda a: a.singleton() if isinstance(a, APLArray) else a, a)
+
+  return APLArray(safeguard(flatten(indxs([], req), len(apl.shape) - 2)), newshape)
+
 # Helper for making simple dy/monadic functions
 def make_operator(d=None, m=None):
   def dyadic(left, right=None):
     left = APLize(left)
-    if right: # Dyadic
+    if right != None: # Dyadic
       right = APLize(right)
       if left.singleton():
         return right.mapAll(lambda r: d(left.singleton(), r))
@@ -194,11 +245,11 @@ def make_operator(d=None, m=None):
 
 Iota = lambda a: APLArray(list(range(1, a+1)))
 
-Add  = make_operator(lambda l, r: l + r, id)
+Plus = make_operator(lambda l, r: l + r, id)
 Minu = make_operator(lambda l, r: l - r, lambda a: -1*a)
 Mult = make_operator(lambda l, r: l * r, lambda a: a/abs(a))
 Divi = make_operator(lambda l, r: float(l) / float(r), lambda a: math.pow(a, -1))
-Pow  = make_operator(lambda l, r: math.pow(l, r), lambda a: math.pow(math.e, a)) 
+Star = make_operator(lambda l, r: math.pow(l, r), lambda a: math.pow(math.e, a)) 
 Min  = make_operator(lambda l, r: l if l < r else r, lambda a: math.floor(a))
 Max  = make_operator(lambda l, r: l if l > r else r, lambda a: math.ceil(a))
 GrE  = make_operator(lambda l, r: 1 if l >= r else 0)
@@ -218,9 +269,9 @@ t = Rho([3, 4], Iota(1000))
 t2 = Rho([2, 2, 3, 4], Iota(1000))
 
 # print(Split(Rho([3, 4], Iota(1000)), axis=1))
-# print(Rho([2, 3, 4], a))
-# print(Split(Rho([2, 3, 4], a)))
-# print(Split(Rho([2, 3, 4], a), axis=2))
+print(Rho([2, 3, 4], a))
+print(Split(Rho([2, 3, 4], a)))
+print(Split(Rho([2, 3, 4], a), axis=2))
 # print(Split(Rho([2, 3, 4], a), axis=1))
 print(t2)
 print(Split(t2, axis=3))
@@ -231,8 +282,31 @@ print(Drop(APLArray([-1]), t))
 print(Drop(APLArray([-1, 2]), t))
 print(Drop(APLArray([1]), t2))
 print(Drop(APLArray([1, 1, -2]), t2))
+print(Plus(A([1, 2, 3, 4]), A([2, 3, 4, 5])))
 
-print(box("hello world", title="asdf"))
+
+a = A([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+b = A([1, 4, 5, 6, 7, 8, 2, 3, 1, 2])
+
+print(a.shape)
+print(b.shape)
+print(zipWith(lambda a, b: a + b, a.arr, b.arr))
+print(Divi(a, b))
+
+c = Reduce(Plus, a)
+d = A([2])
+# print(c.shape)
+# print(d.shape)
+# print(type(c.arr[0]))
+# print(type(d.arr[0]))
+# print(type(t[1, 2]))
+# print(t[1, 2])
+#print(zipWith(lambda a, b: a, c.arr, A([2]).arr))
+#print((lambda a: Divi(Reduce(Plus, a), len(a)))(a))
+print(type(Reduce(Plus, a).arr[0]))
+print(Plus(Reduce(Plus, t), Iota(3)))
+print(type(Iota(3).arr[0]))
+print(Divi(Reduce(Plus, a), len(a)))
 
 # test = APLArray(iota(32), [4,2,2,2])
 # print("shape: " + str(test.shape))
