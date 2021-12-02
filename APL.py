@@ -188,6 +188,8 @@ def Split(apl, axis=-1):
 
 def Drop(l, r):
   ## TODO check shape of left
+  l = APLize(l)
+  r = APLize(r)
   if len(l.shape) != 1:
     raise APLError("RANK ERROR")
   diff = fmap(lambda a: abs(a), l.arr)
@@ -277,7 +279,6 @@ print(t2)
 print(Split(t2, axis=3))
 
 print(t)
-print(Drop(APLArray([1]), t))
 print(Drop(APLArray([-1]), t))
 print(Drop(APLArray([-1, 2]), t))
 print(Drop(APLArray([1]), t2))
@@ -306,8 +307,10 @@ d = A([2])
 print(type(Reduce(Plus, a).arr[0]))
 print(Plus(Reduce(Plus, t), Iota(3)))
 print(type(Iota(3).arr[0]))
-print(Divi(Reduce(Plus, a), len(a)))
+print(Divi(Reduce(Plus, a), len(a)).shape)
 
+
+print(type(Drop(APLArray([1]), t)))
 # test = APLArray(iota(32), [4,2,2,2])
 # print("shape: " + str(test.shape))
 # print(test.at(2))
@@ -318,3 +321,6 @@ print(Divi(Reduce(Plus, a), len(a)))
 # print(Pow(APLArray([1, 2, 3])))
 # print(Divi(APLArray([3]), APLArray([1, 2, 3])))
 # print(Max(APLArray([1, 2, 3, 4])))
+
+x = Rho([2, 2, 3], Iota(2*2*3))
+print(Reduce(Plus, x))
