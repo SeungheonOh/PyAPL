@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*- 
+# TODO APLize function names
 import math
 
 id = lambda a: a
@@ -226,9 +227,11 @@ def Reduce(op, r, axis=-1):
   # TODO use newshape for flattening
   return APLArray(safeguard(flatten(indxs([], req), len(apl.shape) - 2)), newshape)
 
+# Generalized Inner Product
 def dot(op1, op2):
   def f(left, right):
     # Validate : (¯1↑⍴X)≡(1↑⍴Y)
+    # TODO Deal with Singleton
     if left.shape[-1] != right.shape[0]:
       raise APLError("LENGTH ERROR")
     # new shape : (¯1↓⍴X),(1↓⍴Y)
@@ -236,7 +239,9 @@ def dot(op1, op2):
     newshape = left.shape[:-1] + right.shape[1:]
 
     req = fmap(lambda a: list(range(1, a+1)), newshape)
+    # make left
     glef = lambda arr: fmap(lambda a: left.at(*arr[:len(left.shape) - 1] + [a]), range(1, transpos+1))
+    # make right
     grgh = lambda arr: fmap(lambda a: right.at(*[a] + arr[len(left.shape) - 1:]), range(1, transpos+1))
     mk = lambda arr: reduce(op1, zipWith(op2, glef(arr), grgh(arr)))
     indx = lambda arr, opt: fmap(lambda b: indx(b, opt[1:]), fmap(lambda a: arr + [a], opt[0])) if len(opt) > 0 else mk(arr)
@@ -248,6 +253,16 @@ def dot(op1, op2):
 
     return APLArray(safeguard(flatten(indx([], req), len(newshape)-1)), newshape)
   return f
+
+# Outter Product
+def JotDot(left, right):
+  newshape = left.shape + right.shape
+  req = fmap(lambda a: list(range(1, a+1)), newshape)
+  glef = lambda arr: fmap
+  indx = lambda arr, opt: fmap(lambda na: indx(na, opt[1:]), fmap(lambda a: opt + [a], opt[0])) if len(opt) > 0 else arr
+  
+  flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
+  safeguard = lambda a: fmap(lambda a: a.singleton() if isinstance(a, APLArray) else a, a)
 
 # Helper for making simple dy/monadic functions
 def make_operator(d=None, m=None):
@@ -281,9 +296,9 @@ Min  = make_operator(lambda l, r: l if l < r else r   , lambda a: math.floor(a) 
 Max  = make_operator(lambda l, r: l if l > r else r   , lambda a: math.ceil(a)                                 )
 Magn = make_operator(lambda l, r: 0                   , lambda a: int(abs(a)) if isinstance(a, int) else abs(a))
 GrE  = make_operator(lambda l, r: 1 if l >= r else 0)
-Gr   = make_operator(lambda l, r: 1 if l > r else 0)
+Gr   = make_operator(lambda l, r: 1 if l > r else 0 )
 LeE  = make_operator(lambda l, r: 1 if l <= r else 0)
-Le   = make_operator(lambda l, r: 1 if l < r else 0)
+Le   = make_operator(lambda l, r: 1 if l < r else 0 )
 
 # print(Rho([2, 3, 4, 5, 6], Iota(3333))[2])
 # print(Rho([2, 3,3], Iota(18)))
@@ -326,3 +341,5 @@ print(b)
 print(dot(Max, Mult)(u, i))
 
 print(dot(Plus, Mult)(Rho([2, 3], Iota(6)), Rho([3, 2], Iota(5))))
+
+print(dot(Plus, Mult)(APLArray([1, 2, 3]), APLArray([4, 5, 6])) == APLArray([32]))
