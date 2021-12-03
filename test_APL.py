@@ -6,6 +6,9 @@ c = A([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 m = Rho([2, 3, 4, 5, 6], Iota(2 * 3 * 4 * 5 * 6))
 t = Rho([2, 3, 4, 5, 6], Iota(6))
 x = Rho([2, 2, 3], Iota(2*2*3))
+u = Rho([2, 3, 4], Iota(10))
+i = Rho([4, 3, 2], Iota(10))
+
 
 def test_Basic():
     assert m[2, 1, 2, 1, 2] == 392
@@ -46,6 +49,10 @@ def test_Reduce():
     assert Reduce(Max, APLArray([1, 6, 7, 8, 9, 10, 2, 3, 4, 5])) == APLArray([10])
     assert Reduce(Plus, x) == APLArray([6,15,24,33], [2, 2])
     assert Reduce(Divi, m)
+
+def test_Dot():
+    assert dot(Max, Mult)(u, i) == APLArray([36,40,18,20,21,24,72,80,54,60,49,56,70,80,90,100,45,54,54,60,36,40,35,40,90,100,72,80,63,72,36,40,18,20,21,24], [2, 3, 3, 2])
+    assert dot(Plus, Mult)(Rho([2, 3], Iota(6)), Rho([3, 2], Iota(5))) == APLArray([22,13,49,34], [2,2])
 
 def test_Average():
     avg = lambda a: Divi(Reduce(Plus, a), len(a))

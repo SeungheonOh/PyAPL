@@ -8,6 +8,7 @@ zipWith = lambda f, a, b: [f(a[0], b[0])] + zipWith(f, a[1:], b[1:]) if len(a) >
 zip3With = lambda f, a, b, c: [f(a[0], b[0], c[0])] + zip3With(f, a[1:], b[1:], c[1:]) if len(a) > 1 and len(b) > 1 else [f(a[0], b[0], c[0])]
 numstr = lambda f: str(f) if not isinstance(f, float) else "{:.2f}".format(f)
 
+print(fmap(lambda a: a+1, [1, 2, 3, 4]))
 # returns unicode string
 def box(msg, title=None):
   lines = fmap(lambda a: a.rstrip(), msg.split("\n"))
@@ -222,7 +223,31 @@ def Reduce(op, r, axis=-1):
   # We don't want APLArray in APLArray
   safeguard = lambda a: fmap(lambda a: a.singleton() if isinstance(a, APLArray) else a, a)
 
+  # TODO use newshape for flattening
   return APLArray(safeguard(flatten(indxs([], req), len(apl.shape) - 2)), newshape)
+
+def dot(op1, op2):
+  def f(left, right):
+    # Validate : (¯1↑⍴X)≡(1↑⍴Y)
+    if left.shape[-1] != right.shape[0]:
+      raise APLError("LENGTH ERROR")
+    # new shape : (¯1↓⍴X),(1↓⍴Y)
+    transpos = left.shape[-1]
+    newshape = left.shape[:-1] + right.shape[1:]
+
+    req = fmap(lambda a: list(range(1, a+1)), newshape)
+    glef = lambda arr: fmap(lambda a: left.at(*arr[:len(left.shape) - 1] + [a]), range(1, transpos+1))
+    grgh = lambda arr: fmap(lambda a: right.at(*[a] + arr[len(left.shape) - 1:]), range(1, transpos+1))
+    mk = lambda arr: reduce(op1, zipWith(op2, glef(arr), grgh(arr)))
+    indx = lambda arr, opt: fmap(lambda b: indx(b, opt[1:]), fmap(lambda a: arr + [a], opt[0])) if len(opt) > 0 else mk(arr)
+
+    flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
+
+    # We don't want APLArray in APLArray
+    safeguard = lambda a: fmap(lambda a: a.singleton() if isinstance(a, APLArray) else a, a)
+
+    return APLArray(safeguard(flatten(indx([], req), len(newshape)-1)), newshape)
+  return f
 
 # Helper for making simple dy/monadic functions
 def make_operator(d=None, m=None):
@@ -247,80 +272,57 @@ def make_operator(d=None, m=None):
 
 Iota = lambda a: APLArray(list(range(1, a+1)))
 
-Plus = make_operator(lambda l, r: l + r, id)
-Minu = make_operator(lambda l, r: l - r, lambda a: -1*a)
-Mult = make_operator(lambda l, r: l * r, lambda a: a/abs(a))
-Divi = make_operator(lambda l, r: float(l) / float(r), lambda a: math.pow(a, -1))
-Star = make_operator(lambda l, r: math.pow(l, r), lambda a: math.pow(math.e, a)) 
-Min  = make_operator(lambda l, r: l if l < r else r, lambda a: math.floor(a))
-Max  = make_operator(lambda l, r: l if l > r else r, lambda a: math.ceil(a))
+Plus = make_operator(lambda l, r: l + r               , id                                                     )
+Minu = make_operator(lambda l, r: l - r               , lambda a: -1*a                                         )
+Mult = make_operator(lambda l, r: l * r               , lambda a: a/abs(a)                                     )
+Divi = make_operator(lambda l, r: float(l) / float(r) , lambda a: math.pow(a, -1)                              )
+Star = make_operator(lambda l, r: math.pow(l, r)      , lambda a: math.pow(math.e, a)                          ) 
+Min  = make_operator(lambda l, r: l if l < r else r   , lambda a: math.floor(a)                                )
+Max  = make_operator(lambda l, r: l if l > r else r   , lambda a: math.ceil(a)                                 )
+Magn = make_operator(lambda l, r: 0                   , lambda a: int(abs(a)) if isinstance(a, int) else abs(a))
 GrE  = make_operator(lambda l, r: 1 if l >= r else 0)
 Gr   = make_operator(lambda l, r: 1 if l > r else 0)
 LeE  = make_operator(lambda l, r: 1 if l <= r else 0)
 Le   = make_operator(lambda l, r: 1 if l < r else 0)
-Magn = make_operator(lambda l, r: 0, lambda a: int(abs(a)) if isinstance(a, int) else abs(a))
 
 # print(Rho([2, 3, 4, 5, 6], Iota(3333))[2])
 # print(Rho([2, 3,3], Iota(18)))
 # print(Le(4, Rho([2, 3,3], Iota(18))))
 
 a = "A B C D E F G H I J K L M N O P Q R S T U V W X".split(" ")
-print(a)
-
+a = Rho([2, 3, 4], a)
 t = Rho([3, 4], Iota(1000))
 t2 = Rho([2, 2, 3, 4], Iota(1000))
 
-# print(Split(Rho([3, 4], Iota(1000)), axis=1))
-print(Rho([2, 3, 4], a))
-print(Split(Rho([2, 3, 4], a)))
-print(Split(Rho([2, 3, 4], a), axis=2))
-# print(Split(Rho([2, 3, 4], a), axis=1))
-print(t2)
-print(Split(t2, axis=3))
+print()
+print(a)
+print(Split(a))
+print(Split(a, axis=2))
 
+print()
 print(t)
 print(Drop(APLArray([-1]), t))
 print(Drop(APLArray([-1, 2]), t))
+
+print()
+print(t2)
+print(Split(t2, axis=3))
 print(Drop(APLArray([1]), t2))
 print(Drop(APLArray([1, 1, -2]), t2))
-print(Plus(A([1, 2, 3, 4]), A([2, 3, 4, 5])))
-
-
-a = A([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-b = A([1, 4, 5, 6, 7, 8, 2, 3, 1, 2])
-
-print(a.shape)
-print(b.shape)
-print(zipWith(lambda a, b: a + b, a.arr, b.arr))
-print(Divi(a, b))
-
-c = Reduce(Plus, a)
-d = A([2])
-# print(c.shape)
-# print(d.shape)
-# print(type(c.arr[0]))
-# print(type(d.arr[0]))
-# print(type(t[1, 2]))
-# print(t[1, 2])
-#print(zipWith(lambda a, b: a, c.arr, A([2]).arr))
-#print((lambda a: Divi(Reduce(Plus, a), len(a)))(a))
-print(type(Reduce(Plus, a).arr[0]))
-print(Plus(Reduce(Plus, t), Iota(3)))
-print(type(Iota(3).arr[0]))
-print(Divi(Reduce(Plus, a), len(a)).shape)
-
-
-print(type(Drop(APLArray([1]), t)))
-# test = APLArray(iota(32), [4,2,2,2])
-# print("shape: " + str(test.shape))
-# print(test.at(2))
-
-# print(Minu(APLArray([1, 2, 3])))
-# print(Divi(APLArray([1, 0.5, 3, 1, 0.5, 3], [2, 3])))
-#print(Add(APLArray([1, 2, 3, 4], [2, 2]), APLArray([1, 2, 3, 4], [2, 2])))
-# print(Pow(APLArray([1, 2, 3])))
-# print(Divi(APLArray([3]), APLArray([1, 2, 3])))
-# print(Max(APLArray([1, 2, 3, 4])))
 
 x = Rho([2, 2, 3], Iota(2*2*3))
+print()
+print(x)
 print(Reduce(Plus, x))
+
+u = Rho([2, 3, 4], Iota(10))
+i = Rho([4, 3, 2], Iota(10))
+p = Rho([4, 2], Iota(10))
+a = Rho([2, 3], Iota(6))
+b = Rho([3, 2], [10, 11, 20, 21, 30, 31])
+print()
+print(a)
+print(b)
+print(dot(Max, Mult)(u, i))
+
+print(dot(Plus, Mult)(Rho([2, 3], Iota(6)), Rho([3, 2], Iota(5))))
