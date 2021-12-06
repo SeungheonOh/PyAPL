@@ -36,9 +36,7 @@ class APLArray:
   # shapes orders from largest demention to the least demention
   def __init__(self, arr, shape=None, box=True):
     self.box = box
-    if isinstance(arr, APLArray): # We don't want APLArray getting nested
-      self.arr = arr.arr
-    elif isinstance(arr, int): 
+    if isinstance(arr, int): 
       self.arr = [arr]
       self.shape = [0]
       return
@@ -56,6 +54,9 @@ class APLArray:
     return self.shape == a.shape and self.arr == a.arr
 
   def __str__(self):
+    # Redo this to support array in array
+    if self.singleton():
+      return str(self.arr)
     longest = max(fmap(lambda a: numstr(a), self.arr), key=lambda d: len(d))
     fmt = lambda a: '{0: >{width}}'.format(numstr(a), width=len(longest))
     mkStr = lambda arr: " ".join(fmap(fmt, arr.arr)) if len(arr.shape) == 1 else box("\n".join(fmap(lambda a: mkStr(arr.at(a)), range(1, arr.shape[0]+1))), title=",".join(fmap(str, arr.shape)))
@@ -188,6 +189,26 @@ def Split(apl, axis=-1):
 
   return APLArray(flatten(indxs([], req), len(apl.shape) - 2), newshape)
 
+def Reverse(apl, axis=-1):
+  if axis == -1:
+    axis = len(apl.shape) - 1
+  else:
+    axis = axis - 1
+
+  newshape = apl.shape
+  req = fmap(lambda a: list(range(1, a+1)), apl.shape)
+  req = req[:axis] + [req[axis][::-1]] + req[axis+1:] # there's gotta be a better way
+  mk = lambda arr: apl.at(*arr)
+  indxs = lambda arr, opt: fmap(lambda a: indxs(a, opt[1:]), fmap(lambda a: arr + [a], opt[0])) if len(opt) > 0 else mk(arr)
+  flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
+  return APLArray(flatten(indxs([], req), len(apl.shape) - 1), newshape)
+
+def ReverseFirst(apl):
+  return Reverse(apl, axis=1)
+  
+def Rotate(l, r):
+  pass
+
 def Drop(l, r):
   ## TODO check shape of left
   l = APLize(l)
@@ -230,6 +251,8 @@ def Reduce(op, r, axis=-1):
 # Generalized Inner Product
 def dot(op1, op2):
   def f(left, right):
+    left = APLize(left)
+    right = APLize(right)
     # Validate : (¯1↑⍴X)≡(1↑⍴Y)
     # TODO Deal with Singleton
     if left.shape[-1] != right.shape[0]:
@@ -255,14 +278,20 @@ def dot(op1, op2):
   return f
 
 # Outter Product
-def JotDot(left, right):
-  newshape = left.shape + right.shape
-  req = fmap(lambda a: list(range(1, a+1)), newshape)
-  glef = lambda arr: fmap
-  indx = lambda arr, opt: fmap(lambda na: indx(na, opt[1:]), fmap(lambda a: opt + [a], opt[0])) if len(opt) > 0 else arr
-  
-  flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
-  safeguard = lambda a: fmap(lambda a: a.singleton() if isinstance(a, APLArray) else a, a)
+def JotDot(op):
+  def f(left, right):
+    if left.singleton():
+      return right.mapAll(lambda r: op(left.singleton(), r))
+    elif right.singleton():
+      return left.mapAll(lambda l: op(l, right.singleton()))
+    newshape = left.shape + right.shape
+    req = fmap(lambda a: list(range(1, a+1)), newshape)
+    mk = lambda arr: op(left.at(*arr[:len(left.shape)]), right.at(*arr[-len(right.shape):]))
+    indx = lambda arr, opt: fmap(lambda b: indx(b, opt[1:]), fmap(lambda a: arr + [a], opt[0])) if len(opt) > 0 else mk(arr)
+    flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
+    safeguard = lambda a: fmap(lambda a: a.singleton() if isinstance(a, APLArray) else a, a)
+    return APLArray(safeguard(flatten(indx([], req), len(newshape) - 1)), newshape)
+  return f
 
 # Helper for making simple dy/monadic functions
 def make_operator(d=None, m=None):
@@ -270,9 +299,9 @@ def make_operator(d=None, m=None):
     left = APLize(left)
     if right != None: # Dyadic
       right = APLize(right)
-      if left.singleton():
+      if left.singleton() != None:
         return right.mapAll(lambda r: d(left.singleton(), r))
-      elif right.singleton():
+      elif right.singleton() != None:
         return left.mapAll(lambda l: d(l, right.singleton()))
       elif right.shape == left.shape:
         arr = zipWith(d, left.arr, right.arr)
@@ -343,3 +372,12 @@ print(dot(Max, Mult)(u, i))
 print(dot(Plus, Mult)(Rho([2, 3], Iota(6)), Rho([3, 2], Iota(5))))
 
 print(dot(Plus, Mult)(APLArray([1, 2, 3]), APLArray([4, 5, 6])) == APLArray([32]))
+
+print(JotDot(Plus)(A([10, 20, 30]), Iota(6)))
+print(ReverseFirst(Reverse(JotDot(Plus)(A([10, 20, 30]), Iota(6)))))
+print(Reverse(JotDot(Plus)(A([10, 20, 30]), Iota(6)), axis=1))
+#print(JotDot(Plus)(u,i))
+print(ReverseFirst(Reverse(APLArray([1, 2, 3, 4, 5]))))
+print(APLArray([Rho([3, 3], Iota(9))]).shape)
+print(APLArray([Rho([3, 3], Iota(9))]).singleton())
+print(JotDot(Plus)(APLArray([-1, 0, 1]), APLArray([Rho([3, 3,3], Iota(9))])))
