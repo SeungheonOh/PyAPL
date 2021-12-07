@@ -35,6 +35,6 @@ life = lambda b: dot(Or, And)(APLArray([1, b]), Eq([3, 4], Reduce(Plus, (JotDot(
 while True:
   print("\033[?25h\033[H\033[?25l")
   board = life(board)
-  pretty = A(fmap(lambda a: "@" if a else "_", board.arr), board.shape)
+  pretty = board.mapAll(lambda a: "@" if a else "_")
   print(pretty)
   time.sleep(0.5)
