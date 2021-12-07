@@ -1,10 +1,7 @@
-  # TODO
-  # flatten first then mk
 # -*- coding: utf-8 -*- 
 # TODO APLize function names
+# TODO Better printing
 import math
-import time
-import os
 
 id = lambda a: a
 fmap = lambda f, a: list(map(f, a))

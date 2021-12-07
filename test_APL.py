@@ -57,7 +57,6 @@ def test_Dot():
 
 def test_JotDot():
     assert JotDot(Plus)(a, b) == APLArray([3,4,5,6,7,4,5,6,7,8,5,6,7,8,9,6,7,8,9,10,7,8,9,10,11], [5, 5])
-    assert JotDot(Plus)(c, v) == APLArray([4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10], [2, 3, 3, 2])
 
 def test_Average():
     avg = lambda a: Divi(Reduce(Plus, a), len(a))
