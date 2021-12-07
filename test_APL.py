@@ -8,6 +8,8 @@ t = Rho([2, 3, 4, 5, 6], Iota(6))
 x = Rho([2, 2, 3], Iota(2*2*3))
 u = Rho([2, 3, 4], Iota(10))
 i = Rho([4, 3, 2], Iota(10))
+c = Rho([2, 3], Iota(6))
+v = Rho([3, 2], Iota(2))
 
 
 def test_Basic():
@@ -16,8 +18,8 @@ def test_Basic():
     assert Rho([2, 3, 3], Iota(18)) == APLArray([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18], [2, 3, 3])
 
 def test_Types():
-    #assert APLArray([1]).shape == [0]
-    #assert Reduce(Plus, [1, 2, 3]) == APLArray([6])
+    assert APLArray([1]).shape == [0]
+    assert Reduce(Plus, [1, 2, 3]) == APLArray([6])
     pass
 
 def test_Arith():
@@ -52,6 +54,10 @@ def test_Dot():
     assert dot(Max, Mult)(u, i) == APLArray([36,40,18,20,21,24,72,80,54,60,49,56,70,80,90,100,45,54,54,60,36,40,35,40,90,100,72,80,63,72,36,40,18,20,21,24], [2, 3, 3, 2])
     assert dot(Plus, Mult)(Rho([2, 3], Iota(6)), Rho([3, 2], Iota(5))) == APLArray([22,13,49,34], [2,2])
     assert dot(Plus, Mult)(APLArray([1, 2, 3]), APLArray([4, 5, 6])) == APLArray([32])
+
+def test_JotDot():
+    assert JotDot(Plus)(a, b) == APLArray([3,4,5,6,7,4,5,6,7,8,5,6,7,8,9,6,7,8,9,10,7,8,9,10,11], [5, 5])
+    assert JotDot(Plus)(c, v) == APLArray([4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10], [2, 3, 3, 2])
 
 def test_Average():
     avg = lambda a: Divi(Reduce(Plus, a), len(a))

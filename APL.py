@@ -166,13 +166,13 @@ def Rho(left, right=None):
 
 def Split(apl, axis=-1):
   apl = APLize(apl)
+  if len(apl.shape) == 1:
+    return APLArray(apl.arr, [])
+
   if axis == -1:
     axis = len(apl.shape) - 1
   else:
     axis = axis - 1
-  # Range of fixed axis
-  fixedRange = list(range(1, apl.shape[axis]+1))
-
   # axis that are not fixed
   newshape = apl.shape[:axis] + apl.shape[axis+1:]
 
@@ -183,14 +183,8 @@ def Split(apl, axis=-1):
 
   # Indexs - I have no idea what i did :D
   ## It generates index list of splited Array
-  mk = lambda arr: fmap(lambda b: apl.at(*arr[:axis]+[b]+arr[axis:]), fixedRange)
-  indxs = lambda arr, opt: fmap(lambda a: indxs(a, opt[1:]), fmap(lambda a: arr + [a], opt[0])) if len(opt) > 0 else mk(arr)
-
-  # Reduce util...
-  ## list of integer list
-  flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
-
-  return APLArray(flatten(indxs([], req), len(apl.shape) - 2), newshape)
+  mk = lambda arr: fmap(lambda b: apl.at(*arr[:axis]+[b]+arr[axis:]), list(range(1, apl.shape[axis]+1)))
+  return APLArray(fmap(mk, flatten(indexs([], req), len(newshape) - 1)), newshape)
 
 def Reverse(apl, axis=-1):
   if axis == -1:
@@ -202,9 +196,7 @@ def Reverse(apl, axis=-1):
   req = fmap(lambda a: list(range(1, a+1)), apl.shape)
   req = req[:axis] + [req[axis][::-1]] + req[axis+1:] # there's gotta be a better way
   mk = lambda arr: apl.at(*arr)
-  indxs = lambda arr, opt: fmap(lambda a: indxs(a, opt[1:]), fmap(lambda a: arr + [a], opt[0])) if len(opt) > 0 else mk(arr)
-  flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
-  return APLArray(flatten(indxs([], req), len(apl.shape) - 1), newshape)
+  return APLArray(fmap(mk, flatten(indexs([], req), len(apl.shape) - 1)), newshape)
 
 def ReverseFirst(apl):
   return Reverse(apl, axis=1)
@@ -223,9 +215,7 @@ def Rotate(l, r):
   rotate = lambda l, v: l[v:] + l[:v]
   req = zipWith(lambda a, b: rotate(list(range(1, b+1)), a), rot, r.shape)
   mk = lambda arr: r.at(*arr)
-  indx = lambda arr, opt: fmap(lambda a: indx(a, opt[1:]), fmap(lambda a: arr + [a], opt[0])) if len(opt) > 0 else mk(arr)
-  flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
-  return APLArray(flatten(indx([], req), len(r.shape) - 1), r.shape)
+  return APLArray(fmap(mk, flatten(indexs([], req), len(r.shape) - 1)), r.shape)
 
 def RotateFirst(l, r):
   l = APLize(l)
@@ -262,10 +252,7 @@ def Reduce(op, apl, axis=-1):
   newshape = apl.shape[:axis] + apl.shape[axis+1:] 
   req = fmap(lambda a: list(range(1, a+1)), newshape)
   mk = lambda arr: reduce(op, fmap(lambda b: apl.at(*arr[:axis]+[b]+arr[axis:]), list(range(1, apl.shape[axis]+1))))
-  indxs = lambda arr, opt: fmap(lambda a: indxs(a, opt[1:]), fmap(lambda a: arr + [a], opt[0])) if len(opt) > 0 else mk(arr)
-  flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
 
-  # TODO use newshape for flattening
   return APLArray(fmap(mk, flatten(indexs([], req), len(newshape) - 1)), newshape)
 
 # Generalized Inner Product
@@ -277,21 +264,20 @@ def dot(op1, op2):
     # TODO Deal with Singleton
     if left.shape[-1] != right.shape[0]:
       raise APLError("LENGTH ERROR")
+
     # new shape : (¯1↓⍴X),(1↓⍴Y)
     transpos = left.shape[-1]
     newshape = left.shape[:-1] + right.shape[1:]
 
+    if len(newshape) == 0:
+      return APLArray([reduce(op1, zipWith(op2, left.arr, right.arr))], [])
+
     req = fmap(lambda a: list(range(1, a+1)), newshape)
-    # make left
-    glef = lambda arr: fmap(lambda a: left.at(*arr[:len(left.shape) - 1] + [a]), range(1, transpos+1))
-    # make right
-    grgh = lambda arr: fmap(lambda a: right.at(*[a] + arr[len(left.shape) - 1:]), range(1, transpos+1))
-    mk = lambda arr: reduce(op1, zipWith(op2, glef(arr), grgh(arr)))
-    indx = lambda arr, opt: fmap(lambda b: indx(b, opt[1:]), fmap(lambda a: arr + [a], opt[0])) if len(opt) > 0 else mk(arr)
+    mkl = lambda arr: fmap(lambda a: left.at(*arr[:len(left.shape) - 1] + [a]), range(1, transpos+1))
+    mkr = lambda arr: fmap(lambda a: right.at(*[a] + arr[len(left.shape) - 1:]), range(1, transpos+1))
+    mk = lambda arr: reduce(op1, zipWith(op2, mkl(arr), mkr(arr)))
 
-    flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
-
-    return indx([], req) if isinstance(indx([], req), APLArray) else APLArray(flatten(indx([], req), len(newshape)-1), newshape)
+    return APLArray(fmap(mk, flatten(indexs([], req), len(newshape) - 1)), newshape)
   return f
 
 # Outter Product
@@ -306,11 +292,7 @@ def JotDot(op):
     newshape = left.shape + right.shape
     req = fmap(lambda a: list(range(1, a+1)), newshape)
     mk = lambda arr: op(left.at(*arr[:len(left.shape)]), right.at(*arr[-len(right.shape):]))
-    indx = lambda arr, opt: fmap(lambda b: indx(b, opt[1:]), fmap(lambda a: arr + [a], opt[0])) if len(opt) > 0 else mk(arr)
-    flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
-    safeguard = lambda a: fmap(lambda a: a.singleton() if isinstance(a, APLArray) else a, a)
-    safeguard = id
-    return APLArray(safeguard(flatten(indx([], req), len(newshape) - 1)), newshape)
+    return APLArray(fmap(mk, flatten(indexs([], req), len(newshape) - 1)), newshape)
   return f
 
 # Helper for making simple dy/monadic functions
@@ -325,13 +307,17 @@ def make_operator(d=None, m=None):
           return m(left)
     # Actual APLArraies
     left = APLize(left)
-    left = left.singleton() if isinstance(left.singleton(), APLArray) else left # unwrap
+    #left = left.singleton() if isinstance(left.singleton(), APLArray) else left # unwrap
     if right != None: # Dyadic
       right = APLize(right)
-      right = right.singleton() if isinstance(right.singleton(), APLArray) else right # unwrap
+      #right = right.singleton() if isinstance(right.singleton(), APLArray) else right # unwrap
       if left.singleton() != None:
+        if isinstance(left.singleton(), APLArray):
+          return right.mapAll(lambda r: left.singleton().mapAll(lambda a: d(r, a)))
         return right.mapAll(lambda r: d(left.singleton(), r))
       elif right.singleton() != None:
+        if isinstance(right.singleton(), APLArray):
+          return left.mapAll(lambda l: right.singleton().mapAll(lambda a: d(l, a)))
         return left.mapAll(lambda l: d(l, right.singleton()))
       elif right.shape == left.shape:
         arr = zipWith(d, left.arr, right.arr)
@@ -410,78 +396,46 @@ Or   = make_operator(lambda l, r: 1 if l or r else 0)
 # print(ReverseFirst(Reverse(JotDot(Plus)(A([10, 20, 30]), Iota(6)))))
 # print(Reverse(JotDot(Plus)(A([10, 20, 30]), Iota(6)), axis=1))
 # #print(JotDot(Plus)(u,i))
-# print(ReverseFirst(Reverse(APLArray([1, 2, 3, 4, 5]))))
-# print(APLArray([Rho([3, 3], Iota(9))]).shape)
-# print(APLArray([Rho([3, 3], Iota(9))]).singleton())
-# print(Rotate(A([1, 2]), Rho(A([3, 4]), APLArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]))))
+# # print(ReverseFirst(Reverse(APLArray([1, 2, 3, 4, 5]))))
+# # print(APLArray([Rho([3, 3], Iota(9))]).shape)
+# # print(APLArray([Rho([3, 3], Iota(9))]).singleton())
+# # print(Rotate(A([1, 2]), Rho(A([3, 4]), APLArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]))))
 
-# [0,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,1,0,0,0,0,0,0,0]
-flat = lambda a: a[0] + flat(a[1:]) if len(a) > 1 else a[0]
-test = [
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+# # [0,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,1,0,0,0,0,0,0,0]
 
-]
-board = Rho([len(test), len(test[0])], flat(test))
+# a = A([1, 2, 3])
+# b = A([4, 5, 6])
 
-⊖ = RotateFirst
+# print("here")
+# #print(life(board))
+# print(type(Reduce(Plus, APLArray([1, 2, 3, 4])).singleton()))
+# print(type(Reduce(Plus, A([a, a, b, b])).singleton().arr[0]))
+# print(type(Reduce(Plus, A([a, a, b, b], [2, 2])).arr))
 
-while True:
-  print("\033[H")
-  # life←{⊃1 ⍵∨.∧3 4=+/+⌿¯1 0 1∘.⊖¯1 0 1⌽¨⊂⍵}
-  life = lambda b: dot(Or, And)(APLArray([1, b]), (lambda a: [Eq(3, a), Eq(4, a)])(Reduce(Plus, (JotDot(Rotate)([-1,0,1], JotDot(RotateFirst)([-1, 0, 1], [b]))).arr)))
-  board = life(board)
-  pretty = A(fmap(lambda a: "@" if a else "_", board.arr), board.shape)
-  print(pretty)
-  time.sleep(0.04)
+# print("===here")
+# # print("there:", dot(Or, And)(APLArray([A([0, 1, 1]), A([0, 0, 1]), A([0, 1, 1]), A([0, 0, 1])], [2, 2]), APLArray([A([0, 1, 1]), A([0, 0, 1]), A([0, 1, 1]), A([0, 1, 1])], [2, 2])))
+# # print("there:", dot(Or, And)(A([1, 2, 3, 4], [2, 2]), A([1, 2, 3, 4], [2, 2])))
+# # print("here :", dot(Or, And)(APLArray([1, 1]), APLArray([0, 1])).arr)
+# # print("here :", dot(Plus, Mult)(APLArray([1, 2]), APLArray([3, 4])))
 
-a = A([1, 2, 3])
-b = A([4, 5, 6])
+# # print(Or(Eq(3, reduce(Plus, life(board).arr)), And(board, Eq(4, reduce(Plus, life(board).arr)))))
+# # print(type(dot(Or, And)(APLArray([1, board]), APLArray([Eq(3, reduce(Plus, life(board).arr)), Eq(4, reduce(Plus, life(board).arr))])).arr[0]))
 
-print("here")
-print(life(board))
-print(reduce(Plus, life(board).arr))
-print((lambda b: [Eq(3, b), Eq(4, b)])(Reduce(Plus, life(board).arr)))
-print(type(Reduce(Plus, APLArray([1, 2, 3, 4])).singleton()))
-print(type(Reduce(Plus, A([a, a, b, b])).singleton().arr))
-print(type(Reduce(Plus, A([a, a, b, b], [2, 2])).arr))
+# # print(dot(Plus, Mult)(Rho([2, 3], Iota(6)), Rho([3, 2], Iota(5))))
+# #print(Or(Eq(3, reduce(Plus, life(board).arr)), And(board, Eq(4, reduce(Plus, life(board).arr)))))
+# #print(Eq(3, reduce(Plus, life(Rho([3,3], [1, 0, 0, 0, 1, 0, 0, 0, 0])).arr)))
+# #print(Eq(4, reduce(Plus, life(Rho([3,3], [1, 0, 0, 0, 1, 0, 0, 0, 0])).arr)))
 
-print("===here")
-# print("there:", dot(Or, And)(APLArray([A([0, 1, 1]), A([0, 0, 1]), A([0, 1, 1]), A([0, 0, 1])], [2, 2]), APLArray([A([0, 1, 1]), A([0, 0, 1]), A([0, 1, 1]), A([0, 1, 1])], [2, 2])))
-# print("there:", dot(Or, And)(A([1, 2, 3, 4], [2, 2]), A([1, 2, 3, 4], [2, 2])))
-# print("here :", dot(Or, And)(APLArray([1, 1]), APLArray([0, 1])).arr)
-# print("here :", dot(Plus, Mult)(APLArray([1, 2]), APLArray([3, 4])))
+# a = APLArray([1, 2, 3])
+# b = APLArray([4, 5, 6])
 
-# print(Or(Eq(3, reduce(Plus, life(board).arr)), And(board, Eq(4, reduce(Plus, life(board).arr)))))
-# print(type(dot(Or, And)(APLArray([1, board]), APLArray([Eq(3, reduce(Plus, life(board).arr)), Eq(4, reduce(Plus, life(board).arr))])).arr[0]))
+# print("HERE")
+# print(dot(Plus, Mult)([1, 2, 3], [4, 5, 6]).singleton())
+# print((dot(Plus, Mult)(APLArray([a, b]), APLArray([a, b])).singleton().shape))
+# print("this", dot(Plus, Mult)(Rho([2, 3], Iota(6)), Rho([3, 2], Iota(5))))
+# print("HERE")
 
-# print(dot(Plus, Mult)(Rho([2, 3], Iota(6)), Rho([3, 2], Iota(5))))
-#print(Or(Eq(3, reduce(Plus, life(board).arr)), And(board, Eq(4, reduce(Plus, life(board).arr)))))
-#print(Eq(3, reduce(Plus, life(Rho([3,3], [1, 0, 0, 0, 1, 0, 0, 0, 0])).arr)))
-#print(Eq(4, reduce(Plus, life(Rho([3,3], [1, 0, 0, 0, 1, 0, 0, 0, 0])).arr)))
 
-a = APLArray([1, 2, 3])
-b = APLArray([4, 5, 6])
-
-print(dot(Plus, Mult)([1, 2], [3, 4]))
-print(dot(Plus, Mult)(APLArray([a, b]), APLArray([a, b])))
-print(dot(Plus, Mult)(Rho([2, 3], Iota(6)), Rho([3, 2], Iota(5))))
+# x = Rho([2, 2, 3], Iota(2*2*3))
+# print(Split(x, axis=1))
+# print(Split([1, 2]))
