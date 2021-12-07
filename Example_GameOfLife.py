@@ -1,9 +1,5 @@
 from APL import *
-
 import time
-
-
-# life←{⊃1 ⍵∨.∧3 4=+/+⌿¯1 0 1∘.⊖¯1 0 1⌽¨⊂⍵}
 
 flat = lambda a: a[0] + flat(a[1:]) if len(a) > 1 else a[0]
 board = [
@@ -30,11 +26,12 @@ board = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 board = Rho([len(board), len(board[0])], flat(board))
+
+# life←{⊃1 ⍵∨.∧3 4=+/+⌿¯1 0 1∘.⊖¯1 0 1⌽¨⊂⍵}
 life = lambda b: dot(Or, And)(APLArray([1, b]), Eq([3, 4], Reduce(Plus, (JotDot(Rotate)([-1,0,1], JotDot(RotateFirst)([-1, 0, 1], [b]))).arr))).singleton()
 
 while True:
   print("\033[?25h\033[H\033[?25l")
   board = life(board)
-  pretty = board.mapAll(lambda a: "@" if a else "_")
-  print(pretty)
+  print(board.mapAll(lambda a: "@" if a else "_"))
   time.sleep(0.5)
