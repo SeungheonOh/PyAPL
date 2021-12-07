@@ -416,7 +416,6 @@ Or   = make_operator(lambda l, r: 1 if l or r else 0)
 # print(Rotate(A([1, 2]), Rho(A([3, 4]), APLArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]))))
 
 # [0,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,1,0,0,0,0,0,0,0]
-life = lambda b: (lambda rf: (JotDot(Rotate)(rf, JotDot(RotateFirst)(rf, [b]))))(APLArray([-1, 0, 1]))
 flat = lambda a: a[0] + flat(a[1:]) if len(a) > 1 else a[0]
 test = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
@@ -444,10 +443,12 @@ test = [
 ]
 board = Rho([len(test), len(test[0])], flat(test))
 
+⊖ = RotateFirst
+
 while True:
   print("\033[H")
   # life←{⊃1 ⍵∨.∧3 4=+/+⌿¯1 0 1∘.⊖¯1 0 1⌽¨⊂⍵}
-  life = lambda b: dot(Or, And)(APLArray([1, b]), (lambda a: [Eq(3, a), Eq(4, a)])(Reduce(Plus, (lambda rf: (JotDot(Rotate)(rf, JotDot(RotateFirst)(rf, [b]))))(APLArray([-1, 0, 1])).arr)))
+  life = lambda b: dot(Or, And)(APLArray([1, b]), (lambda a: [Eq(3, a), Eq(4, a)])(Reduce(Plus, (JotDot(Rotate)([-1,0,1], JotDot(RotateFirst)([-1, 0, 1], [b]))).arr)))
   board = life(board)
   pretty = A(fmap(lambda a: "@" if a else "_", board.arr), board.shape)
   print(pretty)
