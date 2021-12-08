@@ -44,13 +44,13 @@ Thanks to the flexibility of Python functions and optional arguments, APL Operat
 cleanly in one symbol like those of APL. 
 
 ## Concurrency
-An attempts to implement concurrent operations in the Core indexing function and Array operators, but most of the operations
+An attempts to implement concurrent operations in the Core indexing function and Array operators was made, but most of the operations
 were bottlenecked by the BinOperations, by the fact that Python does not support Tail Recursion Optimization, and by the delay
 on pool allocation. There were no improvements in the performance; rather, it mostly harmed the performance. 
 
 
 There was a brief consideration of implementing core in C with ffi interfacing, but the ctype and cffi documentation
-proved itself to be a great pain. 
+proved itself to be a great pain; struggling in untyped maddness of Python was enough for me.
 
 So, at this point, there is nothing can be done over the matter of performance. It is just a comprehensive implementation 
 of APL (partial) as a Python EDSL. Personally, if it was implemented in more strongly typed and static language with matured 
