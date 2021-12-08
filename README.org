@@ -104,7 +104,6 @@ they allows program to maintain mostly stateless and reproducable always.
 : │4 5 1│
 : │2 3 4│
 : └─────┘
-: 
 
 ** Average
 #+begin_src python :exports both :results output
@@ -130,10 +129,9 @@ Rotates first axis with -1 direction and second axis with 2 direction
 : │3 1 2│
 : │6 4 5│
 : └─────┘
-: 
 
 ** Occurence of Characters
-#+begin_src python exports: both :results output
+#+begin_src python :exports both :results output
   from APL import *
   a = Plus(96, Iota(26)).mapAll(chr) # all alphabet characters
   b = list("bananafish") # given string
@@ -144,5 +142,3 @@ Rotates first axis with -1 direction and second axis with 2 direction
 #+RESULTS:
 : a b c d e f g h i j k l m n o p q r s t u v w x y z
 : 3 1 0 0 0 1 0 1 1 0 0 0 0 2 0 0 0 0 1 0 0 0 0 0 0 0
-
-Number of occurences of each alphabet characters!
