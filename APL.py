@@ -25,6 +25,10 @@ def box(msg, title=None):
   middle = "\n" + "\n".join(fmap(lambda a: "│{:{}s}│".format(a, row), lines)) + "\n"
   return t + middle + b
 
+def chart(arr, title=None):
+  # arr is 2d strings
+  pass
+
 class APLError(Exception):
   pass
 
@@ -130,7 +134,6 @@ class APLArray:
     ## Amount
     newshape = self.shape[len(indexs):] if self.shape[len(indexs):] != [] else [1]
     amount = reduce(lambda a, b: a * b, newshape)
-
 
     ## Brand New Array
     if newshape == [1]: # Prevents nesting
