@@ -1,11 +1,12 @@
 # PyAPL
+(Partial) Implmentation of APL on top of Python--Python APL EDSL
 
 https://aplwiki.com/wiki/Main_Page
 ## Core Design
 ### APL Array
 The `APLArray` object is the core part of this implementation. Unlike typical N-dementional list in Python, which 
 literally puts lists inside of lists N times to accomplish, APLArray seperates the demention from it's data. This means
-that is keeps two arrays, one for data and other for it shape. This has to be done because the "typical" N-dementional list
+that it keeps two arrays, one for data and other for it shape. This has to be done because the "typical" N-dementional list
 in python have no capability to extract its shape (in a sane way), no easy way to transform shapes, and provided not enough 
 abstractions. 
 
@@ -54,3 +55,16 @@ So, at this point, there is nothing can be done over the matter of performance. 
 of APL (partial) as a Python EDSL. Personally, if it was implemented in more strongly typed and static language with matured 
 supports over optimization of recursive calls, the performance would have been tolerable. 
 
+
+
+## Applications
+Like traditional APL, APL provides convenience on manupulating complex data by providing
+framework for array operations like inner products, outer products, rotate, and drop. 
+
+Long, uncomprehensive and overly verbose code that does simple data manupulation is only hindering one
+from understanding the tasks code does. APL, on the other hand, compresses these operations
+and it expressive to the readers. This EDSL provides same expressive operations on top of pure
+Python, allowing one to write same terse code in Python. 
+
+Famous [Conways' Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) is implemented in
+PyAPL as `Example_GameOfLife.py` as an example. Again, it is pretty slow: each generations takes `~ 0.1 Seconds`. But, nothing can be done. 
