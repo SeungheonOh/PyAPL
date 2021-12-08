@@ -1,7 +1,7 @@
 # PyAPL
-(Partial) Implmentation of APL on top of Python--Python APL EDSL
+(Partial) Implmentation of [APL](https://aplwiki.com/wiki/Main_Page) on top of Python--Python APL EDSL
+School Project, Dec 2021.
 
-https://aplwiki.com/wiki/Main_Page
 ## Core Design
 ### APL Array
 The `APLArray` object is the core part of this implementation. Unlike typical N-dementional list in Python, which 
@@ -56,7 +56,6 @@ of APL (partial) as a Python EDSL. Personally, if it was implemented in more str
 supports over optimization of recursive calls, the performance would have been tolerable. 
 
 
-
 ## Applications
 Like traditional APL, APL provides convenience on manupulating complex data by providing
 framework for array operations like inner products, outer products, rotate, and drop. 
@@ -68,3 +67,9 @@ Python, allowing one to write same terse code in Python.
 
 Famous [Conways' Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) is implemented in
 PyAPL as `Example_GameOfLife.py` as an example. Again, it is pretty slow: each generations takes `~ 0.1 Seconds`. But, nothing can be done. 
+
+Other simple examples, like Average of an array, can be found on APL wiki, then be translated into PyAPL.
+
+## Tests
+Some test cases are provided in `test_APL.py` with some array operations and type checkings. Sadly, did not
+have enough time to generate longer test cases, but it will do the job for now. 
