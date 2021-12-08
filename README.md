@@ -30,7 +30,7 @@ It's a big suprise as I did not researched the implementations of vector program
 forehand, yet still yielded similar fundumental implmentations.
 
 ### Dy/Monadic function
-Monad here is not Monad from the type theory that provides binding. Monad in APL means an operator
+Monad here is not [Monad from the type theory](https://wiki.haskell.org/Monad) that provides binding. Monad in APL means an operator
 with only single inputs Array. So `* 5` is a monadic use of `*` operator; it will return `e^5`. 
 
 Dyadic, as its name implys, have two inputs Arrays, from left and right. So `2 * 5` is a dyadic use
