@@ -57,9 +57,8 @@ So, at this point, there is nothing can be done over the matter of performance. 
 of APL (partial) as a Python EDSL. Personally, if it was implemented in more strongly typed and static language with matured 
 supports over optimization of recursive calls, the performance would have been tolerable. 
 
-
 * Applications
-Like traditional APL, APL provides convenience on manupulating complex data by providing
+Like traditional APL, PyAPL provides convenience on manupulating complex data by providing
 framework for array operations like inner products, outer products, rotate, and drop. 
 
 Long, uncomprehensive and overly verbose code that does simple data manupulation is only hindering one
@@ -69,7 +68,7 @@ Python, allowing one to write same terse code in Python.
 
 
 Famous [[https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life][Conway's Game of Life]] is implemented in
-PyAPL as ~Example_GameOfLife.py~ as an example. Again, it is pretty slow: each generations takes ~~ 0.1 Seconds~. But, nothing can be done. 
+PyAPL as ~Example_GameOfLife.py~ as an example. Again, it is pretty slow: each generations takes =~0.1 Seconds=. But, nothing can be done. 
 
 Other simple examples, like Average of an array, can be found on APL wiki, then be translated into PyAPL.
 
@@ -83,5 +82,25 @@ have enough time to generate longer test cases, but it will do the job for now.
 
 * Note
 Codes are written using recursion, mapping; the code is very dense in it's operation. 
-The few functions defined in the top, fmap, reduce, zipWith, flatten, indexs, and more, are used every heavily and essential on understanding 
-the major operations in the entire project.
+The few functions defined in the top, fmap, reduce, zipWith, flatten, indexs, and more, are used heavily
+on almost all operations and is essential on understanding the major operations in the entire project.
+
+Note how entire operations were programed without any utilization of loops.
+Without conventional looping and simple function calls, It might seem uneffective and cryptic, but
+they allows program to maintain mostly stateless and reproducable always.
+
+
+
+* More Examples
+** Reshape
+#+begin_src python :exports both :results output
+  from APL import *
+  print(Rho([3, 3],Iota(5)))
+#+end_src
+
+** Average
+#+begin_src python :exports both :results output
+  from APL import *
+  a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  print(Divi(Reduce(Plus, a), len(a)))
+#+end_src
