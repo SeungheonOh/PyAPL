@@ -1,5 +1,11 @@
 
-#+Title: PyAPL
+#+TITLE: PyAPL
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS: [letterpaper]
+#+LATEX_HEADER: \usepackage{hyperref}
+#+LATEX_HEADER: \usepackage{xcolor}
+#+LATEX_HEADER:\hypersetup{colorlinks, citecolor=violet, linkcolor=red, urlcolor=blue} 
+#+OPTIONS: toc:nil
 (Partial) Implmentation of [[https://aplwiki.com/wiki/Main_Page][APL]] on top of Python--Python APL EDSL
 
 School Project, Dec 2021.
@@ -12,8 +18,7 @@ that it keeps two arrays, one for data and other for it shape. This has to be do
 in python have no capability to extract its shape (in a sane way), no easy way to transform shapes, and provided not enough 
 abstractions. 
 
-Later, turns how this way of showing N-dementional Array in used in [Arther Witney's original one-page 
-interpreter](https://code.jsoftware.com/wiki/Essays/Incunabulum), K Language, a modern APL dialect, and 
+Later, turns how this way of showing N-dementional Array in used in [[https://code.jsoftware.com/wiki/Essays/Incunabulum][Arther Witney's original one-page interpreter]], K Language, a modern APL dialect, and 
 also by Numpy. 
 
 
