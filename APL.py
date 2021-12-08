@@ -64,7 +64,7 @@ class APLArray:
     longest = max(fmap(lambda a: numstr(a), self.arr), key=lambda d: len(d))
     fmt = lambda a: '{0: >{width}}'.format(numstr(a), width=len(longest))
     mkStr = lambda arr: " ".join(fmap(fmt, arr.arr)) if len(arr.shape) == 1 else box("\n".join(fmap(lambda a: mkStr(arr.at(a)), range(1, arr.shape[0]+1))), title=",".join(fmap(str, arr.shape)))
-    return mkStr(self).rstrip() + "\n"
+    return mkStr(self).rstrip()
   
   def __repr__(self):
     return str(self)

@@ -31,7 +31,7 @@ It's a big suprise as I did not researched the implementations of vector program
 forehand, yet still yielded similar fundumental implmentations.
 
 ** Dy/Monadic function
-Monad here is not [Monad from the type theory](https://wiki.haskell.org/Monad) that provides binding. Monad in APL means an operator
+Monad here is not [[https://wiki.haskell.org/Monad][Monad from the Type Theory]] that provides binding operations. Monad in APL means an operator
 with only single inputs Array. So ~* 5~ is a monadic use of ~*~ operator; it will return ~e^5~. 
 
 Dyadic, as its name implys, have two inputs Arrays, from left and right. So ~2 * 5~ is a dyadic use
@@ -45,10 +45,9 @@ Thanks to the flexibility of Python functions and optional arguments, APL Operat
 cleanly in one symbol like those of APL. 
 
 * Concurrency
-An attempts to implement concurrent operations in the Core indexing function and Array operators was made, but most of the operations
-were bottlenecked by the BinOperations, by the fact that Python does not support Tail Recursion Optimization, and by the delay
-on pool allocation. There were no improvements in the performance; rather, it mostly harmed the performance. 
-
+An attempts to implement concurrent operations in the Core indexing function and Array operators was made, but most of the
+operations were bottlenecked by the BinOperations, by the fact that Python does not support Tail Recursion Optimization, and by
+the delay on pool allocation. There were no improvements in the performance; rather, it mostly harmed the performance. 
 
 There was a brief consideration of implementing core in C with ffi interfacing, but the ctype and cffi documentation
 proved itself to be a great pain; struggling in untyped maddness of Python was enough for me.
