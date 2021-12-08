@@ -71,6 +71,10 @@ PyAPL as `Example_GameOfLife.py` as an example. Again, it is pretty slow: each g
 
 Other simple examples, like Average of an array, can be found on APL wiki, then be translated into PyAPL.
 
+Generally, PyAPL can be used in many cases where one has to manupulate data. For example, extracting data
+from variable data formats, like csv, json, xml, and turning pure data into useful forms of data
+through serise of Array operations provided in PyAPL.
+
 ## Tests
 Some test cases are provided in `test_APL.py` with some array operations and type checkings. Sadly, did not
 have enough time to generate longer test cases, but it will do the job for now. 
