@@ -68,8 +68,6 @@ class APLArray:
     else:
       self.shape = [len(arr)] if not shape else shape
 
-    self.fill()
-    
   def __eq__(self, a):
     if not isinstance(a, APLArray):
       return
@@ -458,12 +456,3 @@ Or   = make_operator(lambda l, r: 1 if l or r else 0)
 # print((dot(Plus, Mult)(APLArray([a, b]), APLArray([a, b])).singleton().shape))
 # print("this", dot(Plus, Mult)(Rho([2, 3], Iota(6)), Rho([3, 2], Iota(5))))
 # print("HERE")
-
-
-x = Rho([2, 2, 3], Iota(2*2*3))
-z = APLArray([x, x], [2])
-y = APLArray([z, z, z, z], [2, 2])
-q = APLArray([x, x], [2,2,2])
-print(q)
-
-print(Rho([3, 3, 3], Iota(4)))
