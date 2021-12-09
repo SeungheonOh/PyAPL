@@ -93,8 +93,6 @@ Note how entire operations were programed without any utilization of loops.
 Without conventional looping and simple function calls, It might seem uneffective and cryptic, but
 they allows program to maintain mostly stateless and reproducable always.
 
-
-
 * More Examples
 ** Reshape
 #+begin_src python :exports both :results output

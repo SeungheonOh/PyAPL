@@ -11,23 +11,37 @@ zip3With = lambda f, a, b, c: [f(a[0], b[0], c[0])] + zip3With(f, a[1:], b[1:], 
 numstr = lambda f: str(f) if not isinstance(f, float) else "{:.2f}".format(f)
 indexs = lambda arr, opt: fmap(lambda a: indexs(a, opt[1:]), fmap(lambda a: arr + [a], opt[0])) if len(opt) > 0 else arr
 flatten = lambda a, d: flatten(reduce(lambda a, b: a+b, a), d-1) if d > 0 else a
+xtimes = lambda a, x: "".join([a]*x)
 
 # returns unicode string
 def box(msg, title=None):
   lines = fmap(lambda a: a.rstrip(), msg.split("\n"))
   row = max(fmap(lambda a: len(a), lines))
-  if title:
-    title = title[:row]
-    t = ''.join(['┌'] + [title] + ['─'*(row - len(title))] + ['┐'])
-  else: 
-    t = ''.join(['┌'] + ['─'*row] + ['┐'])
+  t = ''.join(['┌'] + ['─'*row] + ['┐']) if not title else ''.join(['┌'] + [title[:row]] + ['─'*(row - len(title[:row]))] + ['┐'])
   b = ''.join(['└'] + ['─'*row] + ['┘'])
   middle = "\n" + "\n".join(fmap(lambda a: "│{:{}s}│".format(a, row), lines)) + "\n"
   return t + middle + b
 
-def chart(arr, title=None):
+# ┤ ┴ ├ ┬ ┼
+def chart(arr, cols, title=""):
   # arr is 2d strings
-  pass
+  if arr == []:
+    return ""
+  arr = arr + [""] * ((len(arr) * cols - len(arr)) % cols)
+  a = fmap(lambda a: a.split("\n"), arr)
+  mcol = max(fmap(len, flatten(a, 1)))
+  mrow = max(fmap(len, a))
+  fmt = lambda s: "│{:{}s}".format(s, mcol)
+  title = title[:mcol]
+  p = lambda a: fmap(lambda b: b + [""]*(max(fmap(len, a))-len(b)), a)
+  test = lambda a: fmap(lambda c: fmap(lambda b: b[c], a), range(len(a[0])))
+  pall = lambda a: [test(p(a[:cols]))] + pall(a[cols:]) if len(a) > 0 else []
+
+  m = ''.join(['├'] + [xtimes('─',mcol)] + ['┼' + xtimes('─',mcol)]*(cols-1) + ['┤']) + "\n" 
+  t = ''.join(['┌'] + [title + xtimes('─', mcol - len(title))] + ['┬' + xtimes('─',mcol)]*(cols-1) + ['┐']) + "\n"
+  d = m.join(fmap(lambda b: "\n".join(fmap(lambda a: "".join(fmap(lambda c: fmt(c), a)) + "│", b)) + "\n", pall(a)))
+  b = ''.join(['└'] + [xtimes('─',mcol)] + ['┴' + xtimes('─',mcol)]*(cols-1) + ['┘'])
+  return t + d + b
 
 class APLError(Exception):
   pass
@@ -53,6 +67,8 @@ class APLArray:
       self.shape = [0] # array with shape 0 should be considered as a list
     else:
       self.shape = [len(arr)] if not shape else shape
+
+    self.fill()
     
   def __eq__(self, a):
     if not isinstance(a, APLArray):
@@ -60,11 +76,19 @@ class APLArray:
     return self.shape == a.shape and self.arr == a.arr
 
   def __str__(self):
-    # Redo this to support array in array
-    longest = max(fmap(lambda a: numstr(a), self.arr), key=lambda d: len(d))
-    fmt = lambda a: '{0: >{width}}'.format(numstr(a), width=len(longest))
-    mkStr = lambda arr: " ".join(fmap(fmt, arr.arr)) if len(arr.shape) == 1 else box("\n".join(fmap(lambda a: mkStr(arr.at(a)), range(1, arr.shape[0]+1))), title=",".join(fmap(str, arr.shape)))
-    return mkStr(self).rstrip()
+    if type(self.arr[0]) == APLArray:
+      def rec(arr):
+        if len(arr.shape) == 1:
+          return chart(fmap(str, arr.arr), arr.shape[0], title=",".join(fmap(str, arr.shape)))
+        if len(arr.shape) == 2:
+          return chart(fmap(str, arr.arr), arr.shape[1], title=",".join(fmap(str, arr.shape)))
+        return chart(["\n".join(fmap(lambda a: rec(arr.at(a)), range(1, arr.shape[0]+1)))], 1, title=",".join(fmap(str, arr.shape)))
+      return rec(self)
+    else:
+      longest = max(fmap(lambda a: numstr(a), self.arr), key=lambda d: len(d))
+      fmt = lambda a: '{0: >{width}}'.format(numstr(a), width=len(longest))
+      mkStr = lambda arr: " ".join(fmap(fmt, arr.arr)) if len(arr.shape) == 1 else box("\n".join(fmap(lambda a: mkStr(arr.at(a)), range(1, arr.shape[0]+1))), title=",".join(fmap(str, arr.shape)))
+      return mkStr(self).rstrip()
   
   def __repr__(self):
     return str(self)
@@ -436,6 +460,10 @@ Or   = make_operator(lambda l, r: 1 if l or r else 0)
 # print("HERE")
 
 
-# x = Rho([2, 2, 3], Iota(2*2*3))
-# print(Split(x, axis=1))
-# print(Split([1, 2]))
+x = Rho([2, 2, 3], Iota(2*2*3))
+z = APLArray([x, x], [2])
+y = APLArray([z, z, z, z], [2, 2])
+q = APLArray([x, x], [2,2,2])
+print(q)
+
+print(Rho([3, 3, 3], Iota(4)))
