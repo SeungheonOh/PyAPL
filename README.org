@@ -2,6 +2,7 @@
 #+TITLE: PyAPL
 #+LATEX_CLASS: article
 #+LATEX_CLASS_OPTIONS: [letterpaper]
+#+LATEX_HEADER: \usepackage[utf8]{inputenc}
 #+LATEX_HEADER: \usepackage{hyperref}
 #+LATEX_HEADER: \usepackage{xcolor}
 #+LATEX_HEADER:\hypersetup{colorlinks, citecolor=violet, linkcolor=red, urlcolor=blue} 
@@ -145,7 +146,7 @@ Rotates first axis with -1 direction and second axis with 2 direction
 : a b c d e f g h i j k l m n o p q r s t u v w x y z
 : 3 1 0 0 0 1 0 1 1 0 0 0 0 2 0 0 0 0 1 0 0 0 0 0 0 0
 
-** Few more
+** Complex Matrix
 #+begin_src python :exports both :results output
   from APL import *
   print(Rho([3, 4], [Rho([2, 3], Iota(4)), 5, Rho([4, 2], Iota(5))]))
@@ -176,3 +177,111 @@ Rotates first axis with -1 direction and second axis with 2 direction
 │└───┘  │       │       │└───┘  │
 └───────┴───────┴───────┴───────┘
 #+end_example
+
+** Multiple Averages
+#+begin_src python :exports both :results output
+  from APL import *
+  a = APLArray([1, 2, 3, 4, 5, 6])
+  b = APLArray([4, 5, 6, 10, 20, 11])
+  c = APLArray([9, 1, 42, 3, 25, 3])
+  all = APLArray([a,b,c])
+  print(all.mapAll(lambda a: Divi(Reduce(Plus, a), len(a))))
+#+end_src
+
+#+RESULTS:
+:  3.50  9.33 13.83
+
+** Split with specified axis
+#+begin_src python :exports both :results output
+  from APL import *
+  a = Rho([3, 3], Iota(5))
+  print(a)
+  print(Split(a, axis=1))
+  print(Split(a, axis=2))
+#+end_src
+
+#+RESULTS:
+: ┌3,3──┐
+: │1 2 3│
+: │4 5 1│
+: │2 3 4│
+: └─────┘
+: [1, 4, 2] [2, 5, 3] [3, 1, 4]
+: [1, 2, 3] [4, 5, 1] [2, 3, 4]
+
+** Drop
+#+begin_src python :exports both :results output
+  from APL import *
+  a = Rho([3, 3], Iota(5))
+  print(a)
+  print(Drop([1], a))
+  print(Drop([0, -1], a))
+#+end_src
+
+#+RESULTS:
+#+begin_example
+┌3,3──┐
+│1 2 3│
+│4 5 1│
+│2 3 4│
+└─────┘
+┌2,3──┐
+│4 5 1│
+│2 3 4│
+└─────┘
+┌3,2┐
+│1 2│
+│4 5│
+│2 3│
+└───┘
+#+end_example
+
+** Rotate
+*** Rotation of Vectors
+#+begin_src python :exports both :results output
+  from APL import *
+  a = Iota(10)
+  print(a)
+  print(Rotate([2], a))
+  print(Rotate([-2], a))
+#+end_src
+
+#+RESULTS:
+:  1  2  3  4  5  6  7  8  9 10
+:  3  4  5  6  7  8  9 10  1  2
+:  9 10  1  2  3  4  5  6  7  8
+
+*** Rotation of Matrix
+#+begin_src python :exports both :results output
+  from APL import *
+  a = Rho([3, 3], Iota(10))
+  print(a)
+  print(Rotate([2], a))
+  print(Rotate([-2], a))
+  print(Rotate([2, -2], a)) # Multiple axis can be rotated at once
+#+end_src
+
+#+RESULTS:
+#+begin_example
+┌3,3──┐
+│1 2 3│
+│4 5 6│
+│7 8 9│
+└─────┘
+┌3,3──┐
+│7 8 9│
+│1 2 3│
+│4 5 6│
+└─────┘
+┌3,3──┐
+│4 5 6│
+│7 8 9│
+│1 2 3│
+└─────┘
+┌3,3──┐
+│8 9 7│
+│2 3 1│
+│5 6 4│
+└─────┘
+#+end_example
+
