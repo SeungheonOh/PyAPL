@@ -22,10 +22,11 @@ def box(msg, title=None):
   middle = "\n" + "\n".join(fmap(lambda a: "│{:{}s}│".format(a, row), lines)) + "\n"
   return t + middle + b
 
+
 # ┤ ┴ ├ ┬ ┼
 def chart(arr, cols, title=""):
   # arr is 2d strings
-  if arr == []:
+  if arr == [] or cols == 0:
     return ""
   arr = arr + [""] * ((len(arr) * cols - len(arr)) % cols)
   a = fmap(lambda a: a.split("\n"), arr)
@@ -60,11 +61,10 @@ class APLArray:
       self.arr = [arr]
       self.shape = [0]
       return
-    else:
-      self.arr = arr
 
+    self.arr = arr
     if shape == [] or shape == [0] or len(arr) == 1:
-      self.shape = [0] # array with shape 0 should be considered as a list
+      self.shape = [0] if not shape else shape# array with shape 0 should be considered as a list
     else:
       self.shape = [len(arr)] if not shape else shape
 
@@ -369,90 +369,3 @@ Le   = make_operator(lambda l, r: 1 if l < r else 0 )
 Eq   = make_operator(lambda l, r: 1 if l == r else 0)
 And  = make_operator(lambda l, r: 1 if l and r else 0)
 Or   = make_operator(lambda l, r: 1 if l or r else 0)
-
-# print(Rho([2, 3, 4, 5, 6], Iota(3333))[2])
-# print(Rho([2, 3,3], Iota(18)))
-# print(Le(4, Rho([2, 3,3], Iota(18))))
-
-# a = "A B C D E F G H I J K L M N O P Q R S T U V W X".split(" ")
-# a = Rho([2, 3, 4], a)
-# t = Rho([3, 4], Iota(1000))
-# t2 = Rho([2, 2, 3, 4], Iota(1000))
-
-# print()
-# print(a)
-# print(Split(a))
-# print(Split(a, axis=2))
-
-# print()
-# print(t)
-# print(Drop(APLArray([-1]), t))
-# print(Drop(APLArray([-1, 2]), t))
-
-# print()
-# print(t2)
-# print(Split(t2, axis=3))
-# print(Drop(APLArray([1]), t2))
-# print(Drop(APLArray([1, 1, -2]), t2))
-
-# x = Rho([2, 2, 3], Iota(2*2*3))
-# print()
-# print(x)
-# print(Reduce(Plus, x))
-
-# u = Rho([2, 3, 4], Iota(10))
-# i = Rho([4, 3, 2], Iota(10))
-# p = Rho([4, 2], Iota(10))
-# a = Rho([2, 3], Iota(6))
-# b = Rho([3, 2], [10, 11, 20, 21, 30, 31])
-# print()
-# print(a)
-# print(b)
-# print(dot(Max, Mult)(u, i))
-
-# print(dot(Plus, Mult)(Rho([2, 3], Iota(6)), Rho([3, 2], Iota(5))))
-
-# print(dot(Plus, Mult)(APLArray([1, 2, 3]), APLArray([4, 5, 6])) == APLArray([32]))
-
-# print(JotDot(Plus)(A([10, 20, 30]), Iota(6)))
-# print(ReverseFirst(Reverse(JotDot(Plus)(A([10, 20, 30]), Iota(6)))))
-# print(Reverse(JotDot(Plus)(A([10, 20, 30]), Iota(6)), axis=1))
-# #print(JotDot(Plus)(u,i))
-# # print(ReverseFirst(Reverse(APLArray([1, 2, 3, 4, 5]))))
-# # print(APLArray([Rho([3, 3], Iota(9))]).shape)
-# # print(APLArray([Rho([3, 3], Iota(9))]).singleton())
-# # print(Rotate(A([1, 2]), Rho(A([3, 4]), APLArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]))))
-
-# # [0,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,1,0,0,0,0,0,0,0]
-
-# a = A([1, 2, 3])
-# b = A([4, 5, 6])
-
-# print("here")
-# #print(life(board))
-# print(type(Reduce(Plus, APLArray([1, 2, 3, 4])).singleton()))
-# print(type(Reduce(Plus, A([a, a, b, b])).singleton().arr[0]))
-# print(type(Reduce(Plus, A([a, a, b, b], [2, 2])).arr))
-
-# print("===here")
-# # print("there:", dot(Or, And)(APLArray([A([0, 1, 1]), A([0, 0, 1]), A([0, 1, 1]), A([0, 0, 1])], [2, 2]), APLArray([A([0, 1, 1]), A([0, 0, 1]), A([0, 1, 1]), A([0, 1, 1])], [2, 2])))
-# # print("there:", dot(Or, And)(A([1, 2, 3, 4], [2, 2]), A([1, 2, 3, 4], [2, 2])))
-# # print("here :", dot(Or, And)(APLArray([1, 1]), APLArray([0, 1])).arr)
-# # print("here :", dot(Plus, Mult)(APLArray([1, 2]), APLArray([3, 4])))
-
-# # print(Or(Eq(3, reduce(Plus, life(board).arr)), And(board, Eq(4, reduce(Plus, life(board).arr)))))
-# # print(type(dot(Or, And)(APLArray([1, board]), APLArray([Eq(3, reduce(Plus, life(board).arr)), Eq(4, reduce(Plus, life(board).arr))])).arr[0]))
-
-# # print(dot(Plus, Mult)(Rho([2, 3], Iota(6)), Rho([3, 2], Iota(5))))
-# #print(Or(Eq(3, reduce(Plus, life(board).arr)), And(board, Eq(4, reduce(Plus, life(board).arr)))))
-# #print(Eq(3, reduce(Plus, life(Rho([3,3], [1, 0, 0, 0, 1, 0, 0, 0, 0])).arr)))
-# #print(Eq(4, reduce(Plus, life(Rho([3,3], [1, 0, 0, 0, 1, 0, 0, 0, 0])).arr)))
-
-# a = APLArray([1, 2, 3])
-# b = APLArray([4, 5, 6])
-
-# print("HERE")
-# print(dot(Plus, Mult)([1, 2, 3], [4, 5, 6]).singleton())
-# print((dot(Plus, Mult)(APLArray([a, b]), APLArray([a, b])).singleton().shape))
-# print("this", dot(Plus, Mult)(Rho([2, 3], Iota(6)), Rho([3, 2], Iota(5))))
-# print("HERE")
