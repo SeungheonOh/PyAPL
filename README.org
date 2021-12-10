@@ -286,6 +286,34 @@ Rotates first axis with -1 direction and second axis with 2 direction
 └─────┘
 #+end_example
 
+** Mine Sweeper Board
+#+begin_src python :exports both :results output
+  from APL import *
+  flat = lambda a: a[0] + flat(a[1:]) if len(a) > 1 else a[0]
+  board = [ # 1s are mine
+    [0, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0],
+    [0, 0, 0, 1, 0],
+    [0, 1, 1, 0, 0],
+    [0, 0, 0, 0, 0],
+  ]
+  board = Rho([len(board), len(board[0])], flat(board))
+
+  print("Minefield:")
+  life = Reduce(Plus, JotDot(Rotate)([-1,0,1], JotDot(RotateFirst)([-1,0,1], [board])).arr)
+  print(APLArray(zipWith(lambda a, b: "*" if b else a,life.singleton().arr, board.arr), board.shape))
+#+end_src
+
+#+RESULTS:
+: Minefield:
+: ┌5,5──────┐
+: │1 2 2 1 0│
+: │1 * * 2 1│
+: │2 4 5 * 1│
+: │1 * * 2 1│
+: │1 2 2 1 0│
+: └─────────┘
+
 ** Game of Life partial
 #+begin_src python :exports both :results output
   from APL import *
