@@ -184,12 +184,13 @@ Rotates first axis with -1 direction and second axis with 2 direction
   a = APLArray([1, 2, 3, 4, 5, 6])
   b = APLArray([4, 5, 6, 10, 20, 11])
   c = APLArray([9, 1, 42, 3, 25, 3])
-  all = APLArray([a,b,c])
+  d = APLArray([9, 1, 42, 3, 25, 3, 2, 8, 1])
+  all = APLArray([a,b,c,d])
   print(all.mapAll(lambda a: Divi(Reduce(Plus, a), len(a))))
 #+end_src
 
 #+RESULTS:
-:  3.50  9.33 13.83
+:  3.50  9.33 13.83 10.44
 
 ** Split with specified axis
 #+begin_src python :exports both :results output
