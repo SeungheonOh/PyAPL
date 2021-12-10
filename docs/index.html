@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-12-10 Fri 12:34 -->
+<!-- 2021-12-10 Fri 14:53 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>PyAPL</title>
@@ -205,12 +205,12 @@
 School Project, Dec 2021.
 </p>
 
-<div id="outline-container-org4baa367" class="outline-2">
-<h2 id="org4baa367"><span class="section-number-2">1.</span> Core Design</h2>
+<div id="outline-container-orga994708" class="outline-2">
+<h2 id="orga994708"><span class="section-number-2">1.</span> Core Design</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org42aabaf" class="outline-3">
-<h3 id="org42aabaf"><span class="section-number-3">1.1.</span> APL Array</h3>
+<div id="outline-container-orgb47a41d" class="outline-3">
+<h3 id="orgb47a41d"><span class="section-number-3">1.1.</span> APL Array</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 The <code>APLArray</code> object is the core part of this implementation. Unlike typical N-dementional list in Python, which 
@@ -250,8 +250,8 @@ forehand, yet still yielded similar fundumental implmentations.
 </div>
 </div>
 
-<div id="outline-container-org26eeef8" class="outline-3">
-<h3 id="org26eeef8"><span class="section-number-3">1.2.</span> Dy/Monadic function</h3>
+<div id="outline-container-org3662fee" class="outline-3">
+<h3 id="org3662fee"><span class="section-number-3">1.2.</span> Dy/Monadic function</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 Monad here is not <a href="https://wiki.haskell.org/Monad">Monad from the Type Theory</a> that provides binding operations. Monad in APL means an operator
@@ -277,8 +277,8 @@ cleanly in one symbol like those of APL.
 </div>
 </div>
 
-<div id="outline-container-orgcbf10dd" class="outline-2">
-<h2 id="orgcbf10dd"><span class="section-number-2">2.</span> Concurrency</h2>
+<div id="outline-container-org132870d" class="outline-2">
+<h2 id="org132870d"><span class="section-number-2">2.</span> Concurrency</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 An attempts to implement concurrent operations in the Core indexing function and Array operators was made, but most of the
@@ -299,8 +299,8 @@ supports over optimization of recursive calls, the performance would have been t
 </div>
 </div>
 
-<div id="outline-container-org865b8d8" class="outline-2">
-<h2 id="org865b8d8"><span class="section-number-2">3.</span> Applications</h2>
+<div id="outline-container-org5b730a7" class="outline-2">
+<h2 id="org5b730a7"><span class="section-number-2">3.</span> Applications</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Like traditional APL, PyAPL provides convenience on manupulating complex data by providing
@@ -332,8 +332,8 @@ through serise of Array operations provided in PyAPL.
 </div>
 </div>
 
-<div id="outline-container-orgaea8af2" class="outline-2">
-<h2 id="orgaea8af2"><span class="section-number-2">4.</span> Tests</h2>
+<div id="outline-container-orgda9124d" class="outline-2">
+<h2 id="orgda9124d"><span class="section-number-2">4.</span> Tests</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 Some test cases are provided in <code>test_APL.py</code> with some array operations and type checkings. Sadly, did not
@@ -342,8 +342,8 @@ have enough time to generate longer test cases, but it will do the job for now.
 </div>
 </div>
 
-<div id="outline-container-orgd912382" class="outline-2">
-<h2 id="orgd912382"><span class="section-number-2">5.</span> Note</h2>
+<div id="outline-container-orgc9d0605" class="outline-2">
+<h2 id="orgc9d0605"><span class="section-number-2">5.</span> Note</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 Codes are written using recursion, mapping; the code is very dense in it's operation. 
@@ -359,12 +359,12 @@ they allows program to maintain mostly stateless and reproducable always.
 </div>
 </div>
 
-<div id="outline-container-orge5bf1b9" class="outline-2">
-<h2 id="orge5bf1b9"><span class="section-number-2">6.</span> More Examples</h2>
+<div id="outline-container-org5e41309" class="outline-2">
+<h2 id="org5e41309"><span class="section-number-2">6.</span> More Examples</h2>
 <div class="outline-text-2" id="text-6">
 </div>
-<div id="outline-container-orged3af1e" class="outline-3">
-<h3 id="orged3af1e"><span class="section-number-3">6.1.</span> Reshape</h3>
+<div id="outline-container-org8f8da9b" class="outline-3">
+<h3 id="org8f8da9b"><span class="section-number-3">6.1.</span> Reshape</h3>
 <div class="outline-text-3" id="text-6-1">
 <div class="org-src-container">
 <pre class="src src-python">from APL import *
@@ -382,8 +382,8 @@ print(Rho([3, 3],Iota(5)))
 </div>
 </div>
 
-<div id="outline-container-org8231178" class="outline-3">
-<h3 id="org8231178"><span class="section-number-3">6.2.</span> Average</h3>
+<div id="outline-container-orge632d82" class="outline-3">
+<h3 id="orge632d82"><span class="section-number-3">6.2.</span> Average</h3>
 <div class="outline-text-3" id="text-6-2">
 <div class="org-src-container">
 <pre class="src src-python">from APL import *
@@ -398,8 +398,8 @@ print(Divi(Reduce(Plus, a), len(a)))
 </div>
 </div>
 
-<div id="outline-container-orgf0aeee1" class="outline-3">
-<h3 id="orgf0aeee1"><span class="section-number-3">6.3.</span> Rotate</h3>
+<div id="outline-container-org1550e76" class="outline-3">
+<h3 id="org1550e76"><span class="section-number-3">6.3.</span> Rotate</h3>
 <div class="outline-text-3" id="text-6-3">
 <p>
 Rotates first axis with -1 direction and second axis with 2 direction
@@ -421,8 +421,8 @@ print(Rotate([-1, 2], a))
 </div>
 </div>
 
-<div id="outline-container-org88a35b3" class="outline-3">
-<h3 id="org88a35b3"><span class="section-number-3">6.4.</span> Occurence of Characters</h3>
+<div id="outline-container-org93f2c78" class="outline-3">
+<h3 id="org93f2c78"><span class="section-number-3">6.4.</span> Occurence of Characters</h3>
 <div class="outline-text-3" id="text-6-4">
 <div class="org-src-container">
 <pre class="src src-python">from APL import *
@@ -440,8 +440,8 @@ a b c d e f g h i j k l m n o p q r s t u v w x y z
 </div>
 </div>
 
-<div id="outline-container-org652794b" class="outline-3">
-<h3 id="org652794b"><span class="section-number-3">6.5.</span> Complex Matrix</h3>
+<div id="outline-container-org99d7838" class="outline-3">
+<h3 id="org99d7838"><span class="section-number-3">6.5.</span> Complex Matrix</h3>
 <div class="outline-text-3" id="text-6-5">
 <div class="org-src-container">
 <pre class="src src-python">from APL import *
@@ -449,7 +449,7 @@ print(Rho([3, 4], [Rho([2, 3], Iota(4)), 5, Rho([4, 2], Iota(5))]))
 </pre>
 </div>
 
-<pre class="example" id="orgb7d278e">
+<pre class="example" id="org43129a3">
 ┌3,4────┬───────┬───────┬───────┐
 │┌2,3──┐│5      │┌4,2┐  │┌2,3──┐│
 ││1 2 3││       ││1 2│  ││1 2 3││
@@ -476,8 +476,8 @@ print(Rho([3, 4], [Rho([2, 3], Iota(4)), 5, Rho([4, 2], Iota(5))]))
 </div>
 </div>
 
-<div id="outline-container-orge450b85" class="outline-3">
-<h3 id="orge450b85"><span class="section-number-3">6.6.</span> Multiple Averages</h3>
+<div id="outline-container-orgf35966e" class="outline-3">
+<h3 id="orgf35966e"><span class="section-number-3">6.6.</span> Multiple Averages</h3>
 <div class="outline-text-3" id="text-6-6">
 <div class="org-src-container">
 <pre class="src src-python">from APL import *
@@ -498,8 +498,8 @@ print(all.mapAll(lambda a: Divi(Reduce(Plus, a), len(a))))
 </div>
 </div>
 
-<div id="outline-container-org18e00dd" class="outline-3">
-<h3 id="org18e00dd"><span class="section-number-3">6.7.</span> Split with specified axis</h3>
+<div id="outline-container-org641b2e1" class="outline-3">
+<h3 id="org641b2e1"><span class="section-number-3">6.7.</span> Split with specified axis</h3>
 <div class="outline-text-3" id="text-6-7">
 <div class="org-src-container">
 <pre class="src src-python">from APL import *
@@ -522,8 +522,8 @@ print(Split(a, axis=2))
 </div>
 </div>
 
-<div id="outline-container-orgcb6f0ad" class="outline-3">
-<h3 id="orgcb6f0ad"><span class="section-number-3">6.8.</span> Drop</h3>
+<div id="outline-container-org2b66add" class="outline-3">
+<h3 id="org2b66add"><span class="section-number-3">6.8.</span> Drop</h3>
 <div class="outline-text-3" id="text-6-8">
 <div class="org-src-container">
 <pre class="src src-python">from APL import *
@@ -534,7 +534,7 @@ print(Drop([0, -1], a))
 </pre>
 </div>
 
-<pre class="example" id="org195e83d">
+<pre class="example" id="org9d34e91">
 ┌3,3──┐
 │1 2 3│
 │4 5 1│
@@ -553,12 +553,12 @@ print(Drop([0, -1], a))
 </div>
 </div>
 
-<div id="outline-container-orgbcea33d" class="outline-3">
-<h3 id="orgbcea33d"><span class="section-number-3">6.9.</span> Rotate</h3>
+<div id="outline-container-orgb703fd9" class="outline-3">
+<h3 id="orgb703fd9"><span class="section-number-3">6.9.</span> Rotate</h3>
 <div class="outline-text-3" id="text-6-9">
 </div>
-<div id="outline-container-orgafbb35a" class="outline-4">
-<h4 id="orgafbb35a"><span class="section-number-4">6.9.1.</span> Rotation of Vectors</h4>
+<div id="outline-container-org7507b6f" class="outline-4">
+<h4 id="org7507b6f"><span class="section-number-4">6.9.1.</span> Rotation of Vectors</h4>
 <div class="outline-text-4" id="text-6-9-1">
 <div class="org-src-container">
 <pre class="src src-python">from APL import *
@@ -577,8 +577,8 @@ print(Rotate([-2], a))
 </div>
 </div>
 
-<div id="outline-container-org1042a54" class="outline-4">
-<h4 id="org1042a54"><span class="section-number-4">6.9.2.</span> Rotation of Matrix</h4>
+<div id="outline-container-orgbb21c01" class="outline-4">
+<h4 id="orgbb21c01"><span class="section-number-4">6.9.2.</span> Rotation of Matrix</h4>
 <div class="outline-text-4" id="text-6-9-2">
 <div class="org-src-container">
 <pre class="src src-python">from APL import *
@@ -590,7 +590,7 @@ print(Rotate([2, -2], a)) # Multiple axis can be rotated at once
 </pre>
 </div>
 
-<pre class="example" id="org5bdcaa2">
+<pre class="example" id="orgeb6577a">
 ┌3,3──┐
 │1 2 3│
 │4 5 6│
@@ -616,9 +616,43 @@ print(Rotate([2, -2], a)) # Multiple axis can be rotated at once
 </div>
 </div>
 
-<div id="outline-container-orgc228d40" class="outline-3">
-<h3 id="orgc228d40"><span class="section-number-3">6.10.</span> Game of Life partial</h3>
+<div id="outline-container-org4fa12ed" class="outline-3">
+<h3 id="org4fa12ed"><span class="section-number-3">6.10.</span> Mine Sweeper Board</h3>
 <div class="outline-text-3" id="text-6-10">
+<div class="org-src-container">
+<pre class="src src-python">from APL import *
+flat = lambda a: a[0] + flat(a[1:]) if len(a) &gt; 1 else a[0]
+board = [ # 1s are mine
+  [0, 0, 0, 0, 0],
+  [0, 0, 1, 0, 0],
+  [0, 0, 0, 1, 0],
+  [0, 1, 1, 0, 0],
+  [0, 0, 0, 0, 0],
+]
+board = Rho([len(board), len(board[0])], flat(board))
+
+print("Minefield:")
+life = Reduce(Plus, JotDot(Rotate)([-1,0,1], JotDot(RotateFirst)([-1,0,1], [board])).arr)
+print(APLArray(zipWith(lambda a, b: "*" if b else a,life.singleton().arr, board.arr), board.shape))
+</pre>
+</div>
+
+<pre class="example">
+Minefield:
+┌5,5──────┐
+│0 1 1 1 0│
+│0 1 * 2 1│
+│1 3 4 * 1│
+│1 * * 2 1│
+│1 2 2 1 0│
+└─────────┘
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orge7475c3" class="outline-3">
+<h3 id="orge7475c3"><span class="section-number-3">6.11.</span> Game of Life partial</h3>
+<div class="outline-text-3" id="text-6-11">
 <div class="org-src-container">
 <pre class="src src-python">from APL import *
 
@@ -649,7 +683,7 @@ print(dot(Or, And)([1, board], life).singleton())
 </pre>
 </div>
 
-<pre class="example" id="orga218d87">
+<pre class="example" id="org2b598c4">
 All rotations to adjacent cells:
 ┌3,3────────┬───────────┬───────────┐
 │┌5,5──────┐│┌5,5──────┐│┌5,5──────┐│
@@ -709,7 +743,7 @@ New generation!
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: SeungheonOh</p>
-<p class="date">Created: 2021-12-10 Fri 12:34</p>
+<p class="date">Created: 2021-12-10 Fri 14:53</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
