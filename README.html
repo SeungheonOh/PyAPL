@@ -1,0 +1,716 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2021-12-10 Fri 12:34 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PyAPL</title>
+<meta name="author" content="SeungheonOh" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+</style>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">PyAPL</h1>
+<p>
+(Partial) Implmentation of <a href="https://aplwiki.com/wiki/Main_Page">APL</a> on top of Python&#x2013;Python APL EDSL
+</p>
+
+<p>
+School Project, Dec 2021.
+</p>
+
+<div id="outline-container-org4baa367" class="outline-2">
+<h2 id="org4baa367"><span class="section-number-2">1.</span> Core Design</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org42aabaf" class="outline-3">
+<h3 id="org42aabaf"><span class="section-number-3">1.1.</span> APL Array</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+The <code>APLArray</code> object is the core part of this implementation. Unlike typical N-dementional list in Python, which 
+literally puts lists inside of lists N times to accomplish, APLArray seperates the demention from it's data. This means
+that it keeps two arrays, one for data and other for it shape. This has to be done because the "typical" N-dementional list
+in python have no capability to extract its shape (in a sane way), no easy way to transform shapes, and provided not enough 
+abstractions. 
+</p>
+
+<p>
+Later, turns how this way of showing N-dementional Array in used in <a href="https://code.jsoftware.com/wiki/Essays/Incunabulum">Arther Witney's original one-page interpreter</a>, K Language, a modern APL dialect, and 
+also by Numpy. 
+</p>
+
+
+<p>
+In Arther Witney's original one-page interpreter, 
+</p>
+<div class="org-src-container">
+<pre class="src src-c">typedef struct a{I t,r,d[3],p[2];}*A;
+</pre>
+</div>
+<p>
+is almost equivlant to this project's <code>APLArray</code> object: <code>d</code> is data, <code>r</code> is rank, <code>p</code> is shape; 
+<code>.arr</code> is data, <code>len(.shape)</code> is rank, <code>.shape</code> is shape in <code>APLArray</code>.
+</p>
+
+<p>
+Arther Witney's terse C code is very cryptic, but, thankfully, I was able to understand his implmentation of 
+Array. 
+</p>
+
+<p>
+It's a big suprise as I did not researched the implementations of vector programming language in
+forehand, yet still yielded similar fundumental implmentations.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org26eeef8" class="outline-3">
+<h3 id="org26eeef8"><span class="section-number-3">1.2.</span> Dy/Monadic function</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+Monad here is not <a href="https://wiki.haskell.org/Monad">Monad from the Type Theory</a> that provides binding operations. Monad in APL means an operator
+with only single inputs Array. So <code>* 5</code> is a monadic use of <code>*</code> operator; it will return <code>e^5</code>. 
+</p>
+
+<p>
+Dyadic, as its name implys, have two inputs Arrays, from left and right. So <code>2 * 5</code> is a dyadic use
+of <code>*</code> operator; it will return <code>2^5</code>. 
+</p>
+
+<p>
+As shown, most of APL Operators can be used both monadically and dyadically. For example, <code>÷</code> is
+reciprocal monadically and divide dyadically; <code>⌽</code> is "Reverse" monadically and "Rotate" dyadically; and 
+<code>↓</code> is "Split" monadically and "Drop" dyadically. 
+</p>
+
+<p>
+Thanks to the flexibility of Python functions and optional arguments, APL Operators was implmented
+cleanly in one symbol like those of APL. 
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcbf10dd" class="outline-2">
+<h2 id="orgcbf10dd"><span class="section-number-2">2.</span> Concurrency</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+An attempts to implement concurrent operations in the Core indexing function and Array operators was made, but most of the
+operations were bottlenecked by the BinOperations, by the fact that Python does not support Tail Recursion Optimization, and by
+the delay on pool allocation. There were no improvements in the performance; rather, it mostly harmed the performance. 
+</p>
+
+<p>
+There was a brief consideration of implementing core in C with ffi interfacing, but the ctype and cffi documentation
+proved itself to be a great pain; struggling in untyped maddness of Python was enough for me.
+</p>
+
+<p>
+So, at this point, there is nothing can be done over the matter of performance. It is just a comprehensive implementation 
+of APL (partial) as a Python EDSL. Personally, if it was implemented in more strongly typed and static language with matured 
+supports over optimization of recursive calls, the performance would have been tolerable. 
+</p>
+</div>
+</div>
+
+<div id="outline-container-org865b8d8" class="outline-2">
+<h2 id="org865b8d8"><span class="section-number-2">3.</span> Applications</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Like traditional APL, PyAPL provides convenience on manupulating complex data by providing
+framework for array operations like inner products, outer products, rotate, and drop. 
+</p>
+
+<p>
+Long, uncomprehensive and overly verbose code that does simple data manupulation is only hindering one
+from understanding the tasks code does. APL, on the other hand, compresses these operations
+and it expressive to the readers. This EDSL provides same expressive operations on top of pure
+Python, allowing one to write same terse code in Python. 
+</p>
+
+
+<p>
+Famous <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">Conway's Game of Life</a> is implemented in
+PyAPL as <code>Example_GameOfLife.py</code> as an example. Again, it is pretty slow: each generations takes <code>~0.1 Seconds</code>. But, nothing can be done. 
+</p>
+
+<p>
+Other simple examples, like Average of an array, can be found on APL wiki, then be translated into PyAPL.
+</p>
+
+<p>
+Generally, PyAPL can be used in many cases where one has to manupulate data. For example, extracting data
+from variable data formats, like csv, json, xml, and turning pure data into useful forms of data
+through serise of Array operations provided in PyAPL.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgaea8af2" class="outline-2">
+<h2 id="orgaea8af2"><span class="section-number-2">4.</span> Tests</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Some test cases are provided in <code>test_APL.py</code> with some array operations and type checkings. Sadly, did not
+have enough time to generate longer test cases, but it will do the job for now. 
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd912382" class="outline-2">
+<h2 id="orgd912382"><span class="section-number-2">5.</span> Note</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+Codes are written using recursion, mapping; the code is very dense in it's operation. 
+The few functions defined in the top, fmap, reduce, zipWith, flatten, indexs, and more, are used heavily
+on almost all operations and is essential on understanding the major operations in the entire project.
+</p>
+
+<p>
+Note how entire operations were programed without any utilization of loops.
+Without conventional looping and simple function calls, It might seem uneffective and cryptic, but
+they allows program to maintain mostly stateless and reproducable always.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge5bf1b9" class="outline-2">
+<h2 id="orge5bf1b9"><span class="section-number-2">6.</span> More Examples</h2>
+<div class="outline-text-2" id="text-6">
+</div>
+<div id="outline-container-orged3af1e" class="outline-3">
+<h3 id="orged3af1e"><span class="section-number-3">6.1.</span> Reshape</h3>
+<div class="outline-text-3" id="text-6-1">
+<div class="org-src-container">
+<pre class="src src-python">from APL import *
+print(Rho([3, 3],Iota(5)))
+</pre>
+</div>
+
+<pre class="example">
+┌3,3──┐
+│1 2 3│
+│4 5 1│
+│2 3 4│
+└─────┘
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org8231178" class="outline-3">
+<h3 id="org8231178"><span class="section-number-3">6.2.</span> Average</h3>
+<div class="outline-text-3" id="text-6-2">
+<div class="org-src-container">
+<pre class="src src-python">from APL import *
+a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+print(Divi(Reduce(Plus, a), len(a)))
+</pre>
+</div>
+
+<pre class="example">
+5.50
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgf0aeee1" class="outline-3">
+<h3 id="orgf0aeee1"><span class="section-number-3">6.3.</span> Rotate</h3>
+<div class="outline-text-3" id="text-6-3">
+<p>
+Rotates first axis with -1 direction and second axis with 2 direction
+</p>
+<div class="org-src-container">
+<pre class="src src-python">from APL import *
+a = Rho([3, 3], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+print(Rotate([-1, 2], a))
+</pre>
+</div>
+
+<pre class="example">
+┌3,3──┐
+│9 7 8│
+│3 1 2│
+│6 4 5│
+└─────┘
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org88a35b3" class="outline-3">
+<h3 id="org88a35b3"><span class="section-number-3">6.4.</span> Occurence of Characters</h3>
+<div class="outline-text-3" id="text-6-4">
+<div class="org-src-container">
+<pre class="src src-python">from APL import *
+a = Plus(96, Iota(26)).mapAll(chr) # all alphabet characters
+b = list("bananafish") # given string
+print(a)
+print(Reduce(Plus, JotDot(Eq)(a, b)))
+</pre>
+</div>
+
+<pre class="example">
+a b c d e f g h i j k l m n o p q r s t u v w x y z
+3 1 0 0 0 1 0 1 1 0 0 0 0 2 0 0 0 0 1 0 0 0 0 0 0 0
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org652794b" class="outline-3">
+<h3 id="org652794b"><span class="section-number-3">6.5.</span> Complex Matrix</h3>
+<div class="outline-text-3" id="text-6-5">
+<div class="org-src-container">
+<pre class="src src-python">from APL import *
+print(Rho([3, 4], [Rho([2, 3], Iota(4)), 5, Rho([4, 2], Iota(5))]))
+</pre>
+</div>
+
+<pre class="example" id="orgb7d278e">
+┌3,4────┬───────┬───────┬───────┐
+│┌2,3──┐│5      │┌4,2┐  │┌2,3──┐│
+││1 2 3││       ││1 2│  ││1 2 3││
+││4 1 2││       ││3 4│  ││4 1 2││
+│└─────┘│       ││5 1│  │└─────┘│
+│       │       ││2 3│  │       │
+│       │       │└───┘  │       │
+├───────┼───────┼───────┼───────┤
+│5      │┌4,2┐  │┌2,3──┐│5      │
+│       ││1 2│  ││1 2 3││       │
+│       ││3 4│  ││4 1 2││       │
+│       ││5 1│  │└─────┘│       │
+│       ││2 3│  │       │       │
+│       │└───┘  │       │       │
+├───────┼───────┼───────┼───────┤
+│┌4,2┐  │┌2,3──┐│5      │┌4,2┐  │
+││1 2│  ││1 2 3││       ││1 2│  │
+││3 4│  ││4 1 2││       ││3 4│  │
+││5 1│  │└─────┘│       ││5 1│  │
+││2 3│  │       │       ││2 3│  │
+│└───┘  │       │       │└───┘  │
+└───────┴───────┴───────┴───────┘
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orge450b85" class="outline-3">
+<h3 id="orge450b85"><span class="section-number-3">6.6.</span> Multiple Averages</h3>
+<div class="outline-text-3" id="text-6-6">
+<div class="org-src-container">
+<pre class="src src-python">from APL import *
+a = APLArray([1, 2, 3, 4, 5, 6])
+b = APLArray([4, 5, 6, 10, 20, 11])
+c = APLArray([9, 1, 42, 3, 25, 3])
+d = APLArray([9, 1, 42, 3, 25, 3, 2, 8, 1])
+all = APLArray([a,b,c,d])
+print(all.mapAll(lambda a: Divi(Reduce(Plus, a), len(a))))
+</pre>
+</div>
+
+<pre class="example">
+┌4────┬─────┬─────┬─────┐
+│3.50 │9.33 │13.83│10.44│
+└─────┴─────┴─────┴─────┘
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org18e00dd" class="outline-3">
+<h3 id="org18e00dd"><span class="section-number-3">6.7.</span> Split with specified axis</h3>
+<div class="outline-text-3" id="text-6-7">
+<div class="org-src-container">
+<pre class="src src-python">from APL import *
+a = Rho([3, 3], Iota(5))
+print(a)
+print(Split(a, axis=1))
+print(Split(a, axis=2))
+</pre>
+</div>
+
+<pre class="example">
+┌3,3──┐
+│1 2 3│
+│4 5 1│
+│2 3 4│
+└─────┘
+[1, 4, 2] [2, 5, 3] [3, 1, 4]
+[1, 2, 3] [4, 5, 1] [2, 3, 4]
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgcb6f0ad" class="outline-3">
+<h3 id="orgcb6f0ad"><span class="section-number-3">6.8.</span> Drop</h3>
+<div class="outline-text-3" id="text-6-8">
+<div class="org-src-container">
+<pre class="src src-python">from APL import *
+a = Rho([3, 3], Iota(5))
+print(a)
+print(Drop([1], a))
+print(Drop([0, -1], a))
+</pre>
+</div>
+
+<pre class="example" id="org195e83d">
+┌3,3──┐
+│1 2 3│
+│4 5 1│
+│2 3 4│
+└─────┘
+┌2,3──┐
+│4 5 1│
+│2 3 4│
+└─────┘
+┌3,2┐
+│1 2│
+│4 5│
+│2 3│
+└───┘
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgbcea33d" class="outline-3">
+<h3 id="orgbcea33d"><span class="section-number-3">6.9.</span> Rotate</h3>
+<div class="outline-text-3" id="text-6-9">
+</div>
+<div id="outline-container-orgafbb35a" class="outline-4">
+<h4 id="orgafbb35a"><span class="section-number-4">6.9.1.</span> Rotation of Vectors</h4>
+<div class="outline-text-4" id="text-6-9-1">
+<div class="org-src-container">
+<pre class="src src-python">from APL import *
+a = Iota(10)
+print(a)
+print(Rotate([2], a))
+print(Rotate([-2], a))
+</pre>
+</div>
+
+<pre class="example">
+1  2  3  4  5  6  7  8  9 10
+3  4  5  6  7  8  9 10  1  2
+9 10  1  2  3  4  5  6  7  8
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org1042a54" class="outline-4">
+<h4 id="org1042a54"><span class="section-number-4">6.9.2.</span> Rotation of Matrix</h4>
+<div class="outline-text-4" id="text-6-9-2">
+<div class="org-src-container">
+<pre class="src src-python">from APL import *
+a = Rho([3, 3], Iota(10))
+print(a)
+print(Rotate([2], a))
+print(Rotate([-2], a))
+print(Rotate([2, -2], a)) # Multiple axis can be rotated at once
+</pre>
+</div>
+
+<pre class="example" id="org5bdcaa2">
+┌3,3──┐
+│1 2 3│
+│4 5 6│
+│7 8 9│
+└─────┘
+┌3,3──┐
+│7 8 9│
+│1 2 3│
+│4 5 6│
+└─────┘
+┌3,3──┐
+│4 5 6│
+│7 8 9│
+│1 2 3│
+└─────┘
+┌3,3──┐
+│8 9 7│
+│2 3 1│
+│5 6 4│
+└─────┘
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc228d40" class="outline-3">
+<h3 id="orgc228d40"><span class="section-number-3">6.10.</span> Game of Life partial</h3>
+<div class="outline-text-3" id="text-6-10">
+<div class="org-src-container">
+<pre class="src src-python">from APL import *
+
+flat = lambda a: a[0] + flat(a[1:]) if len(a) &gt; 1 else a[0]
+board = [
+  [0, 0, 0, 0, 0],
+  [0, 0, 1, 0, 0],
+  [0, 0, 0, 1, 0],
+  [0, 1, 1, 1, 0],
+  [0, 0, 0, 0, 0],
+]
+board = Rho([len(board), len(board[0])], flat(board)) 
+
+print("All rotations to adjacent cells:")
+life = (JotDot(Rotate)([-1,0,1], JotDot(RotateFirst)([-1, 0, 1], [board])))
+print(life) 
+
+print("Sum of all alive adjacent cells:")
+life = Reduce(Plus, life.arr)
+print(life.singleton()) 
+
+print("Cells with 3 or 4 adjacent cells:")
+life = Eq([3, 4], life)
+print(life)
+
+print("New generation!")
+print(dot(Or, And)([1, board], life).singleton())
+</pre>
+</div>
+
+<pre class="example" id="orga218d87">
+All rotations to adjacent cells:
+┌3,3────────┬───────────┬───────────┐
+│┌5,5──────┐│┌5,5──────┐│┌5,5──────┐│
+││0 0 0 0 0│││0 0 0 0 0│││0 0 0 0 0││
+││0 0 0 0 0│││0 0 0 0 0│││0 0 0 0 0││
+││0 0 0 1 0│││0 0 1 0 0│││0 1 0 0 0││
+││0 0 0 0 1│││0 0 0 1 0│││0 0 1 0 0││
+││0 0 1 1 1│││0 1 1 1 0│││1 1 1 0 0││
+│└─────────┘│└─────────┘│└─────────┘│
+├───────────┼───────────┼───────────┤
+│┌5,5──────┐│┌5,5──────┐│┌5,5──────┐│
+││0 0 0 0 0│││0 0 0 0 0│││0 0 0 0 0││
+││0 0 0 1 0│││0 0 1 0 0│││0 1 0 0 0││
+││0 0 0 0 1│││0 0 0 1 0│││0 0 1 0 0││
+││0 0 1 1 1│││0 1 1 1 0│││1 1 1 0 0││
+││0 0 0 0 0│││0 0 0 0 0│││0 0 0 0 0││
+│└─────────┘│└─────────┘│└─────────┘│
+├───────────┼───────────┼───────────┤
+│┌5,5──────┐│┌5,5──────┐│┌5,5──────┐│
+││0 0 0 1 0│││0 0 1 0 0│││0 1 0 0 0││
+││0 0 0 0 1│││0 0 0 1 0│││0 0 1 0 0││
+││0 0 1 1 1│││0 1 1 1 0│││1 1 1 0 0││
+││0 0 0 0 0│││0 0 0 0 0│││0 0 0 0 0││
+││0 0 0 0 0│││0 0 0 0 0│││0 0 0 0 0││
+│└─────────┘│└─────────┘│└─────────┘│
+└───────────┴───────────┴───────────┘
+Sum of all alive adjacent cells:
+┌5,5──────┐
+│0 1 1 1 0│
+│0 1 2 2 1│
+│1 3 5 4 2│
+│1 2 4 3 2│
+│1 2 3 2 1│
+└─────────┘
+Cells with 3 or 4 adjacent cells:
+┌2──────────┬───────────┐
+│┌5,5──────┐│┌5,5──────┐│
+││0 0 0 0 0│││0 0 0 0 0││
+││0 0 0 0 0│││0 0 0 0 0││
+││0 1 0 0 0│││0 0 0 1 0││
+││0 0 0 1 0│││0 0 1 0 0││
+││0 0 1 0 0│││0 0 0 0 0││
+│└─────────┘│└─────────┘│
+└───────────┴───────────┘
+New generation!
+┌5,5──────┐
+│0 0 0 0 0│
+│0 0 0 0 0│
+│0 1 0 1 0│
+│0 0 1 1 0│
+│0 0 1 0 0│
+└─────────┘
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: SeungheonOh</p>
+<p class="date">Created: 2021-12-10 Fri 12:34</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
