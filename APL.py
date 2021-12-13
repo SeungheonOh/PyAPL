@@ -22,8 +22,6 @@ def box(msg, title=None):
   middle = "\n" + "\n".join(fmap(lambda a: "│{:{}s}│".format(a, row), lines)) + "\n"
   return t + middle + b
 
-
-# ┤ ┴ ├ ┬ ┼
 def chart(arr, cols, title=""):
   # arr is 2d strings
   if arr == [] or cols == 0:
